@@ -1,0 +1,7 @@
+input edge (50% of 2 V)      1.00000 us
+final V(vout)                1.00293 V
+50% of final                 0.50147 V
+vout reaches it at           1.06952 us
+simulated delay              69.52 ns
+0.7*R*C  (R=10k, C=10p)      70.00 ns
+ln2*R*C                      69.31 ns

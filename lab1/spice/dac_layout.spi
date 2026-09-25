@@ -1,0 +1,35 @@
+*** SPICE deck for cell dac{lay} from library lab1
+*** Created on Thu Sep 24, 2026 19:58:16
+*** Last revised on Thu Sep 24, 2026 21:37:10
+*** Written on Thu Sep 24, 2026 21:37:16 by Electric VLSI Design System, version 9.08
+*** Layout tech: mocmos, foundry MOSIS
+*** UC SPICE *** , MIN_RESIST 4.0, MIN_CAPAC 0.1FF
+
+*** SUBCIRCUIT lab1__r_10k FROM CELL r_10k{lay}
+.SUBCKT lab1__r_10k in out
+Rresnwell@3 in out 10k
+.ENDS lab1__r_10k
+
+*** SUBCIRCUIT lab1__r_divider FROM CELL r_divider{lay}
+.SUBCKT lab1__r_divider bot in out
+Rresnwell@0 net@4 in 10k
+Rresnwell@1 net@4 out 10k
+Rresnwell@2 bot out 10k
+.ENDS lab1__r_divider
+
+*** TOP LEVEL CELL: dac{lay}
+Xr_10k@0 net@29 gnd lab1__r_10k
+Xr_divide@0 net@2 b4 vout lab1__r_divider
+Xr_divide@1 net@7 b3 net@2 lab1__r_divider
+Xr_divide@2 net@10 b2 net@7 lab1__r_divider
+Xr_divide@3 net@14 b1 net@10 lab1__r_divider
+Xr_divide@4 net@29 b0 net@14 lab1__r_divider
+
+* Spice Code nodes in cell cell 'dac{lay}'
+v4 b4 0
+v3 b3 0
+v2 b2 0
+v1 b1 0
+vin b0 0 DC 5
+.op
+.END

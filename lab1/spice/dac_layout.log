@@ -1,0 +1,30 @@
+LTspice 26.0.2 for Windows
+Circuit: Z:\home\charlie\School\Y4\Q1\eng3501\lab1\dac_layout.spi
+Start Time: Thu Sep 24 21:37:18 2026
+solver = Normal
+Maximum thread count: 20
+tnom = 27
+temp = 27
+method = trap
+Z:\home\charlie\School\Y4\Q1\eng3501\lab1\dac_layout.spi(29): Missing value, assuming 0V @ DC.
+
+v4 b4 0
+^^^^^^^
+Z:\home\charlie\School\Y4\Q1\eng3501\lab1\dac_layout.spi(30): Missing value, assuming 0V @ DC.
+
+v3 b3 0
+^^^^^^^
+Z:\home\charlie\School\Y4\Q1\eng3501\lab1\dac_layout.spi(31): Missing value, assuming 0V @ DC.
+
+v2 b2 0
+^^^^^^^
+Z:\home\charlie\School\Y4\Q1\eng3501\lab1\dac_layout.spi(32): Missing value, assuming 0V @ DC.
+
+v1 b1 0
+^^^^^^^
+Direct Newton iteration succeeded in finding operating point.
+Total elapsed time: 0.075 seconds.
+
+Files loaded:
+Z:\home\charlie\School\Y4\Q1\eng3501\lab1\dac_layout.spi
+
