@@ -10,7 +10,7 @@ Vschematic|sch
 Tmocmos|ScaleFORmocmos()D300.0|mocmosAnalog()BT|mocmosNumberOfMetalLayers()I3
 
 # Cell dac;1{ic}
-Cdac;1{ic}||artwork|1790300408158|1790300462292|E
+Cdac;1{ic}||artwork|1790300408158|1791301344070|E
 Ngeneric:Facet-Center|art@0||0|0||||AV
 NOpened-Thicker-Polygon|art@1||0|0|6|12|||SCHEM_function(D5G2;)Sdac|trace()V[-3/-6,-3/6,3/6,3/-6,-3/-6]
 Nschematic:Bus_Pin|pin@0||-5|5||||
@@ -23,14 +23,14 @@ Nschematic:Bus_Pin|pin@6||-5|-1||||
 Nschematic:Wire_Pin|pin@7||-3|-1||||
 Nschematic:Bus_Pin|pin@8||-5|-3||||
 Nschematic:Wire_Pin|pin@9||-3|-3||||
-Nschematic:Bus_Pin|pin@10||2|4.5||||
-Nschematic:Wire_Pin|pin@12||5.5|4.5||||
+Nschematic:Bus_Pin|pin@10||3|4.5||||
+Nschematic:Wire_Pin|pin@12||6.5|4.5||||
 Aschematic:wire|net@0|||0|pin@1||-3|5|pin@0||-5|5
 Aschematic:wire|net@1|||0|pin@3||-3|3|pin@2||-5|3
 Aschematic:wire|net@2|||0|pin@5||-3|1|pin@4||-5|1
 Aschematic:wire|net@3|||0|pin@7||-3|-1|pin@6||-5|-1
 Aschematic:wire|net@4|||0|pin@9||-3|-3|pin@8||-5|-3
-Aschematic:wire|net@6|||1800|pin@10||2|4.5|pin@12||5.5|4.5
+Aschematic:wire|net@6|||1800|pin@10||3|4.5|pin@12||6.5|4.5
 Eb0||D5G2;X-1.5;|pin@0||U
 Eb1||D5G2;X-1.5;|pin@2||U
 Eb2||D5G2;X-1.5;|pin@4||U
@@ -143,7 +143,7 @@ Evout||D5G2;X1.5;|conn@5|a|U
 X
 
 # Cell daq_sim;1{sch}
-Cdaq_sim;1{sch}||schematic|1790300560186|1790301330467|
+Cdaq_sim;1{sch}||schematic|1790300560186|1791301344070|
 Ngeneric:Facet-Center|art@0||0|0||||AV
 NCapacitor|cap@0||0|4.5|||||SCHEM_capacitance(D5G1;)S10p
 NOff-Page|conn@0||-21|1||||
@@ -161,7 +161,7 @@ NWire_Pin|pin@17||-21.5|9||||
 Awire|net@26|||2700|gnd@1||0|-1.5|pin@12||0|2
 Awire|net@27|||2700|pin@12||0|2|cap@0|b|0|2.5
 Awire|net@28|||0|conn@1|y|3|8.5|pin@13||0|8.5
-Awire|net@29|||0|pin@13||0|8.5|dac@0|vout|-6.5|8.5
+Awire|net@29|||0|pin@13||0|8.5|dac@0|vout|-5.5|8.5
 Awire|net@30|||2700|cap@0|a|0|6.5|pin@13||0|8.5
 Awire|net@31|||1800|conn@0|y|-19|1|dac@0|b4|-13.5|1
 Awire|net@33|||1800|pin@14||-21.5|3|dac@0|b3|-13.5|3

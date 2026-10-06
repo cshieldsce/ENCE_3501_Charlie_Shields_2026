@@ -151,19 +151,65 @@ Evout||D5G2;X1.5;|conn@5|a|U
 X
 
 # Cell ic;1{lay}
-Cic;1{lay}||mocmos|1790357883338|1790358801220|
+Cic;1{lay}||mocmos|1790357883338|1791302041175|
 Ngeneric:Facet-Center|art@0||0|0||||AV
-NMetal-1-Metal-2-Con|contact@0||-251.5|414.5|12|12||
+NMetal-1-Metal-2-Con|contact@0||-251.5|413.5|12|12||
+NMetal-1-Metal-2-Con|contact@1||-264|24|12|12||
+NMetal-1-Metal-2-Con|contact@2||-104|-151|12|12||
+NMetal-1-Metal-2-Con|contact@3||298|-151|12|12||
+NMetal-1-Metal-2-Con|contact@4||454|20|12|12||
+NMetal-1-Metal-2-Con|contact@5||458.5|408.5|12|12||
+NMetal-1-Metal-2-Con|contact@6||308|587.5|12|12||
 Idac;1{lay}|dac@0||-51|214.5|R||D5G4;
 Ipadframe;1{lay}|padframe@0||-406|-443||A|D5G4;
 NMetal-1-Pin|pin@0||-133|117||||
-NMetal-1-Pin|pin@1||-133|415||||
-NMetal-1-Pin|pin@2||-251.5|415||||
+NMetal-1-Pin|pin@1||-133|413.5||||
+NMetal-1-Pin|pin@2||-251.5|413.5||||
+NMetal-1-Pin|pin@3||-49|24||||
+NMetal-1-Pin|pin@4||-24.5|-95||||
+NMetal-1-Pin|pin@5||-25|-151||||
+NMetal-1-Pin|pin@6||-25|-95||||
+NMetal-1-Pin|pin@7||44.5|-147.5||||
+NMetal-1-Pin|pin@8||44.5|-151||||
+NMetal-1-Pin|pin@9||111.5|30||||
+NMetal-1-Pin|pin@10||111.5|20.5||||
+NMetal-1-Pin|pin@11||111.5|20||||
+NMetal-1-Pin|pin@12||449|108.5||||
+NMetal-1-Pin|pin@13||458.5|108.5||||
+NMetal-1-Pin|pin@14||347|139||||
+NMetal-1-Pin|pin@15||347|589.5||||
+NMetal-1-Pin|pin@16||308|589.5||||
 AMetal-1|net@0||5|S0|dac@0|b4|-91.5|117|pin@0||-133|117
-AMetal-1|net@1||5|S2700|pin@0||-133|117|pin@1||-133|415
-AMetal-1|net@2||13|S2700|contact@0||-251.5|412|pin@2||-251.5|415
-AMetal-1|net@3||5|S0|pin@1||-133|415|pin@2||-251.5|415
-AMetal-2|net@4||13|S0|contact@0||-251.5|414.5|padframe@0|pin[4]|-503.5|414.5
+AMetal-1|net@1||13|S2700|pin@0||-133|117|pin@1||-133|413.5
+AMetal-1|net@2||13|S2700|contact@0||-251.5|413|pin@2||-251.5|413.5
+AMetal-1|net@3||13|S0|pin@1||-133|413.5|pin@2||-251.5|413.5
+AMetal-2|net@4||13|S0|contact@0||-251.5|413|padframe@0|pin[4]|-503.5|413
+AMetal-1|net@5||13|S1800|contact@1||-264|24|pin@3||-49|24
+AMetal-1|net@6||5|S2700|pin@3||-49|24|dac@0|vout|-49|117.5
+AMetal-2|net@7||13|S0|contact@1||-264|24|padframe@0|pin[5]|-503.5|24
+AMetal-1|net@8||5|S900|dac@0|b3|-24.5|117|pin@4||-24.5|-95
+AMetal-1|net@9||13|S1800|contact@2||-104|-151|pin@5||-25|-151
+AMetal-1|net@10||13|S2700|pin@5||-25|-151|pin@6||-25|-95
+AMetal-1|net@11||5|S0|pin@4||-24.5|-95|pin@6||-25|-95
+AMetal-2|net@12||13|S900|contact@2||-104|-151|padframe@0|pin[6]|-104|-379.5
+AMetal-1|net@13||5|S900|dac@0|b2|44.5|110.5|pin@7||44.5|-147.5
+AMetal-1|net@14||5|S900|pin@7||44.5|-147.5|pin@8||44.5|-151
+AMetal-1|net@15||13|S0|contact@3||298|-151|pin@8||44.5|-151
+AMetal-2|net@16||13|S900|contact@3||298|-151|padframe@0|pin[7]|298|-379.5
+AMetal-1|net@17||5|S900|dac@0|b1|111.5|109.5|pin@9||111.5|30
+AMetal-1|net@18||5|S900|pin@9||111.5|30|pin@10||111.5|20.5
+AMetal-1|net@19||5|S900|pin@10||111.5|20.5|pin@11||111.5|20
+AMetal-1|net@20||13|S0|contact@4||454|20|pin@11||111.5|20
+AMetal-2|net@21||13|S1800|contact@4||454|20|padframe@0|pin[8]|696.5|20
+AMetal-1|net@22||5|S1800|dac@0|b0|178.5|108.5|pin@12||449|108.5
+AMetal-1|net@23||5|S1800|pin@12||449|108.5|pin@13||458.5|108.5
+AMetal-1|net@24||13|JS900|contact@5||458.5|408.5|pin@13||458.5|108.5
+AMetal-2|net@25||13|S1800|contact@5||458.5|408.5|padframe@0|pin[1]|696.5|408.5
+AMetal-1|net@26||2|S1800|dac@0|gnd|296|139|pin@14||347|139
+AMetal-1|net@27||2|S2700|pin@14||347|139|pin@15||347|589.5
+AMetal-1|net@28||2|S0|pin@15||347|589.5|pin@16||308|589.5
+AMetal-1|net@29||13|S2700|contact@6||308|587.5|pin@16||308|589.5
+AMetal-2|net@30||13|S2700|contact@6||308|587.5|padframe@0|pin[2]|308|820.5
 X
 
 # Cell ic;1{sch}
@@ -209,10 +255,10 @@ Einout||D5G26;|contact@0||U
 X
 
 # Cell pad;1{sch}
-Cpad;1{sch}||schematic|1790356344494|1790356394636|
+Cpad;1{sch}||schematic|1790356344494|1791301562132|
 Ngeneric:Facet-Center|art@0||0|0||||AV
 NOff-Page|conn@0||-10.5|-1||||
-Ipad;1{ic}|pad@0||10|5.5|||D5G4;
+Ipad;1{ic}|pad@0||3.5|5|||D5G4;
 Einout||D5G2;|conn@0|a|U
 X
 
