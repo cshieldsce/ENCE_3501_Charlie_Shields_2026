@@ -54,12 +54,12 @@ Both curves swing rail to rail with a sharp transition. Reading off where each c
 
 ## Transient with load
 
-`test_inverters_load{sch}` adds a capacitor to ground on each output and switches `vin` with a pulse. The cap value is a parameter, `{x}`, stepped over 1 fF, 10 fF, and 100 fF in one run.
+`test_inverters_load{sch}` adds a capacitor to ground on each output and switches `vin` with a pulse. The cap value is a parameter, `{x}`, stepped over the four loads the handout asks for: 100 fF, 1 pF, 10 pF, and 100 pF.
 
 ```
 vdd vdd 0 DC 5
 vin vin 0 pulse(0v 5v 5n 1n 1n 12n 25n)
-.step param x list 1f 10f 100f
+.step param x list 100f 1p 10p 100p
 .tran 0 25n 0 100p
 .include C5_models.txt
 ```
@@ -68,7 +68,7 @@ vin vin 0 pulse(0v 5v 5n 1n 1n 12n 25n)
 
 *Electric `test_inverters_load{sch}`. Each inverter output drives its own `{x}` load cap.*
 
-Both inverters, all three loads:
+Both inverters, all four loads:
 
 ![Transient, both inverters](images/tran_load_both.png)
 
@@ -78,21 +78,23 @@ Per inverter, to make the 1x and 4x comparison readable:
 
 ![Transient, inverter_1](images/tran_load_inv1.png)
 
-*`inverter_1` (1x), `vout1` against `vin` for each load.*
+*`inverter_1` (1x), `vout1` against `vin` for each of the four loads.*
 
 ![Transient, inverter_2](images/tran_load_inv2.png)
 
-*`inverter_2` (4x), `vout2` against `vin` for each load.*
+*`inverter_2` (4x), `vout2` against `vin` for each of the four loads.*
 
-![Transient, second sweep](images/tran_load_sweep_b.png)
+Earlier run with small caps (1 fF, 10 fF, 100 fF), kept for comparison:
 
-*Second sweep of `vin`, `vout1`, `vout2`; see `sim/test_inverters_load2.plt`.*
+![Transient, small caps](images/tran_load_small_caps.png)
+
+*`vin`, `vout1`, `vout2` for the 1 fF / 10 fF / 100 fF run; this is the deck saved in `sim/test_inverters_load*.spi`. All six edges are fast, with visible overshoot past the rails.*
 
 Observations:
 
-- The output edge slows as `x` grows, as expected for an RC-limited transition; the 100 fF case on the 1x inverter is the slowest by a wide margin.
-- At the same load, the 4x inverter switches faster than the 1x inverter, since it can source and sink 4x the current into the same cap.
-- Small overshoot above `vdd` and below `gnd` right at the input edge in the lighter-load cases: gate-drain coupling pushes the output past the rail until the drive takes over.
+- The output edge slows as `x` grows, as expected for an RC-limited transition. At 100 fF the output swings in a few ns or less.
+- At 10 pF the output has only fallen to about 1.2 V (`vout1`) / 2.8 V (`vout2`) by the time `vin` falls at 18 ns, and at 100 pF it has barely moved, drooping to about 4.6 V / 4.8 V. At those loads the pulse period is far shorter than the output time constant, so the output never reaches a full logic level.
+- Small overshoot above `vdd` and below `gnd` at the input edge in the light-load cases: gate-drain coupling pushes the output past the rail until the drive takes over.
 
 ---
 
@@ -108,7 +110,7 @@ Observations:
 
 ## Notes
 
-- Electric writes the `.spi` deck next to the library, so after a re-run the generated files land in `lab4/`; the copies under `sim/` are the ones used for the plots above.
+- Electric writes the `.spi` deck next to the library, so after a re-run the generated files land in `lab4/`; the decks under `sim/` are from the 1 fF / 10 fF / 100 fF run only. The deck for the 100 fF to 100 pF sweep was not kept; the plots above are from it.
 - LTspice prints `Pd = 0 is less than W` / `Ps = 0 is less than W` warnings for every MOSFET. The schematic MOSFETs carry no drain/source perimeter, so these are expected and harmless here; they will go away once the sim is run from extracted layout.
 - The schematic-level deck has no parasitics beyond the explicit `{x}` caps.
 
