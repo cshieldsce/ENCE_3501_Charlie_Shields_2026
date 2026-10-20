@@ -1,0 +1,35 @@
+# header information:
+HTutorial2|9.08
+
+# Views:
+Vicon|ic
+Vlayout|lay
+Vschematic|sch
+
+# Technologies:
+Tmocmos|ScaleFORmocmos()D300.0|mocmosAnalog()BT|mocmosNumberOfMetalLayers()I3
+
+# Cell pad;1{ic}
+Cpad;1{ic}||artwork|1790012699575|1790012872557|E
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NOpened-Thicker-Polygon|art@1||0|0|6|6|||SCHEM_function(D5G2;)Spad|trace()V[-3/-3,-3/3,3/3,3/-3,-3/-3]
+Nschematic:Bus_Pin|pin@0||-5|0||||
+Nschematic:Wire_Pin|pin@1||-3|0||||
+Aschematic:wire|net@0|||0|pin@1||-3|0|pin@0||-5|0
+Einout||D5G2;X-2.5;|pin@0||U
+X
+
+# Cell pad;1{lay}
+Cpad;1{lay}||mocmos|1790012886031|1790013108461|
+Ngeneric:Facet-Center|art@0||0|0||||AV
+Nartwork:Box|art@1||0|0|400|400||
+NMetal-2-Metal-3-Con|contact@0||0|0|244|244||
+X
+
+# Cell pad;1{sch}
+Cpad;1{sch}||schematic|1790012648909|1790012727491|
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NOff-Page|conn@0||-2.5|0||||
+Ipad;1{ic}|pad@0||12.5|7|||D5G4;
+Einout||D5G2;X-3;|conn@0|a|U
+X

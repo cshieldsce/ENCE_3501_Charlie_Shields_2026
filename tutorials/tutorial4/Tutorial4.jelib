@@ -1,0 +1,87 @@
+# header information:
+HTutorial4|9.08
+
+# Views:
+Vicon|ic
+Vlayout|lay
+Vschematic|sch
+
+# Technologies:
+Tmocmos|mocmosAnalog()BT|mocmosNumberOfMetalLayers()I3
+
+# Cell NOT_Gate;1{ic}
+CNOT_Gate;1{ic}||artwork|1791222450150|1791222657761|E
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NThick-Circle|art@1||8.5|-4.5|2|2||
+NTriangle|art@2||3.5|-4.5|8|8|RRR|
+Nschematic:Bus_Pin|pin@0||-2.5|-4.5||||
+Nschematic:Wire_Pin|pin@1||-0.5|-4.5||||
+Nschematic:Bus_Pin|pin@2||11.5|-4.5|||RR|
+Nschematic:Wire_Pin|pin@3||9.5|-4.5|||RR|
+Aschematic:wire|net@0|||0|pin@1||-0.5|-4.5|pin@0||-2.5|-4.5
+Aschematic:wire|net@1|||1800|pin@3||9.5|-4.5|pin@2||11.5|-4.5
+Ein||D5G2;X-1.5;|pin@0||U
+Eout||D5G2;X-2;|pin@2||U
+X
+
+# Cell NOT_Gate;1{lay}
+CNOT_Gate;1{lay}||mocmos|1791392704807|1791393913514||DRC_last_good_drc_area_date()G1791393741023
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NMetal-1-Polysilicon-1-Con|contact@0||-10|9||||
+NMetal-1-N-Active-Con|contact@1||-7|-2|5||R|
+NMetal-1-P-Active-Con|contact@2||-7.5|31.5|15||R|
+NMetal-1-P-Active-Con|contact@3||2|31.5|15||R|
+NMetal-1-N-Active-Con|contact@4||2|-2|5||R|
+NMetal-1-N-Active-Con|contact@5||-2.5|-23.5|12|||
+NMetal-1-P-Active-Con|contact@6||-2.5|57.5|12|||
+NN-Transistor|nmos@0||-2.5|-2|7||R||SIM_spice_model(D5G2;R)SNMOS
+NPolysilicon-1-Pin|pin@0||-2.5|9||||
+NMetal-1-Pin|pin@1||9.5|9.5||||
+NMetal-1-Pin|pin@2||2.5|9.5||||
+Ngeneric:Invisible-Pin|pin@3||42|7.5|||||SIM_spice_card(D5G4;)S[vdd vdd 0 DC 5,vin in 0 DC 0,.dc vin 0 5 1m,.include C5_models.txt]
+NMetal-1-Pin|pin@4||-8|57||||
+NMetal-1-Pin|pin@5||-7|-23.5||||
+NP-Transistor|pmos@0||-2.5|31.5|17||R||SIM_spice_model(D5G2;R)SPMOS
+APolysilicon-1|net@1|||S900|pmos@0|poly-left|-2.5|19.5|pin@0||-2.5|9
+APolysilicon-1|net@2|||S900|pin@0||-2.5|9|nmos@0|poly-right|-2.5|5
+APolysilicon-1|net@3|||S0|pin@0||-2.5|9|contact@0||-10|9
+AMetal-1|net@5||1|S900|contact@3||2.5|31.5|pin@2||2.5|9.5
+AMetal-1|net@6||1|S900|pin@2||2.5|9.5|contact@4||2.5|-2
+AMetal-1|net@7|||S0|pin@1||9.5|9.5|pin@2||2.5|9.5
+AMetal-1|net@8||1|S2700|contact@2||-8|31.5|pin@4||-8|57
+AMetal-1|net@9||1|S0|contact@6||-2.5|57|pin@4||-8|57
+AMetal-1|net@10||1|S900|contact@1||-7|-2|pin@5||-7|-23.5
+AMetal-1|net@11||1|S0|contact@5||-2.5|-23.5|pin@5||-7|-23.5
+Egnd||D5G2;|contact@5||U
+Ein||D5G2;|contact@0||U
+Eout||D5G2;|pin@1||U
+Evdd||D5G2;|contact@6||U
+X
+
+# Cell NOT_Gate;1{sch}
+CNOT_Gate;1{sch}||schematic|1791222288808|1791222666840|
+INOT_Gate;1{ic}|NOT_Gate@0||16.5|17.5|||D5G4;
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NOff-Page|conn@0||-15.5|0||||
+NOff-Page|conn@1||2|0||||
+NGround|gnd@0||-5|-9.5||||
+NTransistor|nmos@0||-7|3.5|||XRRR||ATTR_length(D5G0.5;X-0.5;Y-1;)S2.0|ATTR_width(D5G1;X0.5;Y-1;)S20|SIM_spice_model(D5G1;Y-4;)SPMOS
+NWire_Pin|pin@0||-10.5|3.5||||
+NWire_Pin|pin@1||-10.5|-4||||
+NWire_Pin|pin@2||-5|0||||
+NWire_Pin|pin@3||-10.5|0||||
+NTransistor|pmos@0||-7|-4|||R|2|ATTR_length(D5G0.5;X-0.5;Y-1;)S2|ATTR_width(D5G1;X0.5;Y-1;)S10|SIM_spice_model(D5G1;X0.5;Y-4;)SNMOS
+NPower|pwr@0||-5|9||||
+Awire|net@1|||0|nmos@0|g|-8|3.5|pin@0||-10.5|3.5
+Awire|net@3|||1800|pin@1||-10.5|-4|pmos@0|g|-8|-4
+Awire|net@4|||2700|gnd@0||-5|-7.5|pmos@0|s|-5|-6
+Awire|net@5|||900|pwr@0||-5|9|nmos@0|s|-5|5.5
+Awire|net@6|||900|nmos@0|d|-5|1.5|pin@2||-5|0
+Awire|net@7|||900|pin@2||-5|0|pmos@0|d|-5|-2
+Awire|net@8|||0|conn@1|a|0|0|pin@2||-5|0
+Awire|net@9|||900|pin@0||-10.5|3.5|pin@3||-10.5|0
+Awire|net@10|||900|pin@3||-10.5|0|pin@1||-10.5|-4
+Awire|net@11|||1800|conn@0|y|-13.5|0|pin@3||-10.5|0
+Ein||D5G2;X-1.5;|conn@0|a|U
+Eout||D5G2;X2;|conn@1|y|U
+X

@@ -1,0 +1,51 @@
+# header information:
+HLab_Tutorial_0|9.08
+
+# Views:
+Vlayout|lay
+Vschematic|sch
+
+# Technologies:
+Tmocmos|ScaleFORmocmos()D300.0|mocmosAnalog()BT|mocmosNumberOfMetalLayers()I3
+
+# Cell r_divider;1{lay}
+Cr_divider;1{lay}||mocmos|1789147680259|1789580598168||DRC_last_good_drc_area_date()G1789580556975|DRC_last_good_drc_bit()I18|DRC_last_good_drc_date()G1789580556975
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NMetal-1-Pin|pin@0||-95|20|2|2||
+NMetal-1-Pin|pin@1||-96|-41|2|2||
+NMetal-1-Pin|pin@2||93|-9|2|2||
+NMetal-1-Pin|pin@4||77.5|-26||||
+NMetal-1-Pin|pin@6||77.5|-9||||
+Ngeneric:Invisible-Pin|pin@7||163|48|||||SIM_spice_card(D5G12;)S[vdd vin 0 DC 5,.op]
+NN-Well-Resistor|resnwell@0||-9|7|123|2|||SCHEM_resistance(D5G12;)S10k
+NN-Well-Resistor|resnwell@1||-9|-26|123|2|||SCHEM_resistance(D5G12;)S10k
+AMetal-1|net@0||2|S2700|resnwell@0|left|-95.5|6|pin@0||-95.5|19
+AMetal-1|net@2|||S1800|resnwell@1|right|77|-26|pin@4||77.5|-26
+AMetal-1|net@4||2|S900|resnwell@1|left|-95.5|-25|pin@1||-95.5|-40
+AMetal-1|net@5||2|S900|resnwell@0|right|77.5|7|pin@6||77.5|-9
+AMetal-1|net@6||2|S900|pin@6||77.5|-9|pin@4||77.5|-26
+AMetal-1|net@7||2|S0|pin@2||93|-9|pin@6||77.5|-9
+Egnd||D5G6;Y-6;|pin@1||U
+Evin||D5G6;Y6;|pin@0||U
+Evout||D5G6;X10.5;|pin@2||U
+X
+
+# Cell r_divider;1{sch}
+Cr_divider;1{sch}||schematic|1789147651820|1789579578874|
+Ngeneric:Facet-Center|art@0||0|0||||AV
+NOff-Page|conn@0||-6.5|16|||RRR|
+NOff-Page|conn@2||-1|8||||
+NGround|gnd@1||-6.5|-0.5||||
+NWire_Pin|pin@5||-6.5|8||||
+Ngeneric:Invisible-Pin|pin@6||6|16|||||SIM_spice_card(D5G1;)S[vdd vin 0 DC 5,.op]
+NResistor|resnwell@2||-6.5|5|||R|3|ATTR_length(D5G0.25;X-1.5;)D164.0|ATTR_width(D5G0.5;X1.5;)D14.0|SCHEM_resistance(D5G1;)S100
+NResistor|resnwell@3||-6.5|11|||R|3|ATTR_length(D5G0.25;X-1.5;)D164.0|ATTR_width(D5G0.5;X1.5;)D14.0|SCHEM_resistance(D5G1;)S100
+Awire|net@5|||2700|resnwell@2|a|-6.5|3|resnwell@2|b|-6.5|7
+Awire|net@8|||2700|gnd@1||-6.5|1.5|resnwell@2|a|-6.5|3
+Awire|net@10|||2700|resnwell@3|b|-6.5|13|conn@0|y|-6.5|14
+Awire|net@11|||900|resnwell@3|a|-6.5|9|pin@5||-6.5|8
+Awire|net@12|||900|pin@5||-6.5|8|resnwell@2|b|-6.5|7
+Awire|net@13|||1800|pin@5||-6.5|8|conn@2|a|-3|8
+Evin||D5G2;X1.5;|conn@0|a|U
+Evout||D5G2;X1.5;|conn@2|a|U
+X
