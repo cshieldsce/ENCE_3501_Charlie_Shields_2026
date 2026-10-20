@@ -11,26 +11,26 @@ Tbicmos|ScaleFORbicmos()D300.0
 Tmocmos|ScaleFORmocmos()D300.0|mocmosAnalog()BT|mocmosNumberOfMetalLayers()I3
 
 # Cell NMOS_IV;1{ic}
-CNMOS_IV;1{ic}||artwork|1664782229647|1664782457565|E
+CNMOS_IV;1{ic}||artwork|1664782229647|1791585922522|E
 Ngeneric:Facet-Center|art@0||0|0||||AV
-NBox|art@4||0|0|4|4||
-Nschematic:Bus_Pin|pin@0||4|0|||RR|
-Nschematic:Wire_Pin|pin@1||2|0|||RR|
+NBox|art@4||0|0|8|4||
+Nschematic:Bus_Pin|pin@0||6|0|||RR|
+Nschematic:Wire_Pin|pin@1||4|0|||RR|
 Nschematic:Bus_Pin|pin@2||0|4|||RRR|
 Nschematic:Wire_Pin|pin@3||0|2|||RRR|
-Nschematic:Bus_Pin|pin@4||-4|0||||
-Nschematic:Wire_Pin|pin@5||-2|0||||
+Nschematic:Bus_Pin|pin@4||-6.5|0||||
+Nschematic:Wire_Pin|pin@5||-4|0||||
 Nschematic:Bus_Pin|pin@6||0|-4|||R|
 Nschematic:Wire_Pin|pin@7||0|-2|||R|
 Ngeneric:Invisible-Pin|pin@9||0|0|||||ART_message(D5G1;)SNMOS
-Aschematic:wire|net@0|||1800|pin@1||2|0|pin@0||4|0
+Aschematic:wire|net@0|||1800|pin@1||4|0|pin@0||6|0
 Aschematic:wire|net@1|||2700|pin@3||0|2|pin@2||0|4
-Aschematic:wire|net@2|||0|pin@5||-2|0|pin@4||-4|0
+Aschematic:wire|net@2|||0|pin@5||-4|0|pin@4||-6.5|0
 Aschematic:wire|net@3|||900|pin@7||0|-2|pin@6||0|-4
-Eb||D5G2;|pin@0||U
-Ed||D5G2;|pin@2||U
-Eg||D5G2;|pin@4||U
-Es||D5G2;|pin@6||U
+Eb||D5G2;X-1.5;|pin@0||U
+Ed||D5G2;X-2;|pin@2||U
+Eg||D5G2;X-1.5;Y0.5;|pin@4||U
+Es||D5G2;X-1;|pin@6||U
 X
 
 # Cell NMOS_IV;1{lay}
@@ -143,10 +143,24 @@ AMetal-1|net@26||47|S2700|pad_esd@2|gnd|-485|-88.5|pad_esd@3|gnd|-485|352.5
 X
 
 # Cell final_ic_esd;1{sch}
-Cfinal_ic_esd;1{sch}||schematic|1664786314490|1791576510004|
-INMOS_IV;1{ic}|NMOS_IV@0||-29|-3|||D5G4;
+Cfinal_ic_esd;1{sch}||schematic|1664786314490|1791586334775|
+INMOS_IV;1{ic}|NMOS_IV@0||-19.5|-11.5|||D5G4;
 Ngeneric:Facet-Center|art@0||0|0||||AV
-Ipadframe_esd;1{ic}|padframe@1||7|-2|||D5G4;
+Ipadframe_esd;1{ic}|padframe@1||17|-12|||D5G4;
+NWire_Pin|pin@0||-10.5|-11.5||||
+NWire_Pin|pin@1||-19.5|-18||||
+NWire_Pin|pin@2||-28.5|-11.5||||
+NWire_Pin|pin@3||-19.5|-4.5||||
+NBus_Pin|pin@4||-10.5|-38.5||||
+NWire_Pin|pin@6||48|-38.5||||
+NWire_Pin|pin[7]|D5G1;Y1.5;|18|-25.5||||
+Awire|net@0|||2700|padframe@1|gnd|18|-29|pin[7]||18|-25.5
+Abus|pin[1:8]|D5G1;Y2;||IJ0|padframe@1|pin[1:8]|-3|-38.5|pin@4||-10.5|-38.5
+Awire|pin[1]|D5G1;Y3;||2700|NMOS_IV@0|d|-19.5|-7.5|pin@3||-19.5|-4.5
+Awire|pin[2]|D5G1;X0.5;Y1.5;||1800|padframe@1|vdd|40.5|-38.5|pin@6||48|-38.5
+Awire|pin[4]|D5G1;X-4.5;||0|NMOS_IV@0|g|-26|-11.5|pin@2||-28.5|-11.5
+Awire|pin[7]|D5G1;X4.5;||1800|NMOS_IV@0|b|-13.5|-11.5|pin@0||-10.5|-11.5
+Awire|pin[8]|D5G1;Y-2.5;||900|NMOS_IV@0|s|-19.5|-15.5|pin@1||-19.5|-18
 X
 
 # Cell final_ic_no_esd;1{lay}
@@ -387,21 +401,21 @@ Epin[1:8]||D5G2;X-4;|conn@0|a|U
 X
 
 # Cell padframe_esd;1{ic}
-Cpadframe_esd;1{ic}||artwork|1791566263439|1791566408973|E
+Cpadframe_esd;1{ic}||artwork|1791566263439|1791586114163|E
 Ngeneric:Facet-Center|art@0||0|0||||AV
-NOpened-Thicker-Polygon|art@1||0|0|15|6|||SCHEM_function(D5G2;)Spadframe_esd|trace()V[-7.5/-3,-7.5/3,7.5/3,7.5/-3,-7.5/-3]
-Nschematic:Bus_Pin|pin@0||-11|0||||
-Ngeneric:Invisible-Pin|pin@1||-7.5|0|1|1||
-Nschematic:Bus_Pin|pin@2||-1|-5||||
-Nschematic:Wire_Pin|pin@3||-1|-3||||
-Nschematic:Bus_Pin|pin@4||15|0||||
-Nschematic:Wire_Pin|pin@5||7.5|0||||
-Aschematic:bus|net@0|||IJ0|pin@1||-7.5|0|pin@0||-11|0
-Aschematic:wire|net@1|||900|pin@3||-1|-3|pin@2||-1|-5
-Aschematic:wire|net@2|||1800|pin@5||7.5|0|pin@4||15|0
-Egnd||D5G2;Y-1;|pin@2||U
-Epin[1:8]||D5G2;X-4.5;|pin@0||U
-Evdd||D5G2;X2;|pin@4||U
+NOpened-Thicker-Polygon|art@1||1|-26.5|30|8|||SCHEM_function(D5G2;)Spadframe_esd|trace()V[-15/-4,-15/4,15/4,15/-4,-15/-4]
+Nschematic:Bus_Pin|pin@0||-20|-26.5||||
+Ngeneric:Invisible-Pin|pin@1||-14|-26.5|1|1||
+Nschematic:Bus_Pin|pin@2||1|-17||||
+Nschematic:Wire_Pin|pin@3||1|-22.5||||
+Nschematic:Bus_Pin|pin@4||23.5|-26.5||||
+Nschematic:Wire_Pin|pin@5||16|-26.5||||
+Aschematic:bus|net@0|||IJ0|pin@1||-14|-26.5|pin@0||-20|-26.5
+Aschematic:wire|net@1|||2700|pin@3||1|-22.5|pin@2||1|-17
+Aschematic:wire|net@2|||1800|pin@5||16|-26.5|pin@4||23.5|-26.5
+Egnd||D5G2;Y2;|pin@2||U
+Epin[1:8]||D5G2;X-8;Y0.5;|pin@0||U
+Evdd||D5G2;X4;Y0.5;|pin@4||U
 X
 
 # Cell padframe_esd;1{lay}

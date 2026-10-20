@@ -63,6 +63,10 @@ p+ active in n-well. Anode is the p+ (tied to `inout`), cathode is the n-well (t
 
 *Electric `pad_esd{lay}`. 400.5 x 673.5 cell: pad on top, two diffusion-in-well diode cells on the bottom half, vdd / gnd rails exiting left and right.*
 
+![pad_esd 3D view](images/pad_esd_3d.png)
+
+*Electric 3D view of `pad_esd{lay}`. Gold-ringed grey plate is the bonding pad; two short clamp stacks sit directly below, with vdd and gnd straps breaking out on metal-2.*
+
 ---
 
 ## Padframe with ESD
@@ -86,7 +90,11 @@ p+ active in n-well. Anode is the p+ (tied to `inout`), cathode is the n-well (t
 
 ![padframe_esd layout](images/padframe_esd_lay.png)
 
-*Electric `padframe_esd{lay}`. 8 ESD-protected pads with vdd / gnd rings on metal-2. Center is open for the DAC.*
+*Electric `padframe_esd{lay}`. 8 ESD-protected pads with vdd / gnd rings on metal-2. Center is open for the device under test.*
+
+<!-- TODO: re-export padframe 3D view and drop in as padframe_3d.png -->
+<!-- ![padframe_esd 3D view](images/padframe_esd_3d.png) -->
+<!-- *Electric 3D view of `padframe_esd{lay}`. All 8 clamp stacks sit under the pads, tied to the two metal-2 rings around the open die cavity.* -->
 
 ---
 
@@ -94,12 +102,16 @@ p+ active in n-well. Anode is the p+ (tied to `inout`), cathode is the n-well (t
 
 ### With ESD (`final_ic_esd`)
 
-Lab 1 DAC dropped into `padframe_esd`, same pad-to-DAC mapping as Lab 2. `vdd` and `gnd` land on the clamp rings; signal pins route through the clamps to the DAC.
+Single NMOS device wired through the ESD-protected padframe. The NMOS's four terminals (gate, drain, source, bulk) land on four pads of `padframe_esd`, so every terminal is now behind one `pActive_nWell` (to vdd) + `nActive_pWell` (to gnd) clamp pair. Point of the lab: with the clamps in place, an ESD strike at any package pin should fire into a rail instead of into the gate.
 
-- Pad mapping: inherited from Lab 2 (`b0`-`b4`, `vout`, `gnd`, 1 spare); `vdd` is now a dedicated frame rail, not a spare pad
-- DRC / NCC / LVS: TODO
+- Pin mapping (from `final_ic_esd{sch}`): `pin[1]`, `pin[4]`, `pin[7]`, `pin[8]` go to the NMOS terminals; `pin[2]` is tapped out as a scalar for probing
+- `pin[1:8]` is the pad bus into `padframe_esd`; `vdd` and `gnd` land on the frame rings
 
-<!-- TODO: add final_ic_esd schematic + layout screenshots -->
+![final_ic_esd schematic](images/final_ic_esd_sch.png)
+
+*Electric `final_ic_esd{sch}`. NMOS on the left, `padframe_esd` on the right with the pin[1:8] bus and the pin[2] / pin[7] scalar taps.*
+
+<!-- TODO: add final_ic_esd{lay} screenshot -->
 
 ### Without ESD (`final_ic_no_esd`)
 
