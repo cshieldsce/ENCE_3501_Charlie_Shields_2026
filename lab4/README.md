@@ -4,7 +4,7 @@
 
 Two CMOS inverters with the same 2:1 PMOS/NMOS ratio but different absolute size (1x and 4x), compared in LTspice against the C5 models: a DC sweep for the voltage transfer curve, then a transient with a pulse input and a stepped capacitive load. Designed in Electric VLSI (`mocmos`, MOSIS).
 
-**Jump to:** [Inverters](#inverters) | [DC transfer](#dc-transfer) | [Transient with load](#transient-with-load) | [Layout](#layout) | [Notes](#notes) | [Files](#files)
+**Jump to:** [Inverters](#inverters) | [DC transfer](#dc-transfer) | [Transient with load](#transient-with-load) | [Layout](#layout) | [Files](#files)
 
 ---
 
@@ -105,14 +105,6 @@ Observations:
 <!-- TODO: layout-vs-schematic / extracted simulation if required by the handout -->
 
 `inverter_1{lay}` and `inverter_2{lay}` exist in `Lab4.jelib` as empty cells and are not drawn yet.
-
----
-
-## Notes
-
-- Electric writes the `.spi` deck next to the library, so after a re-run the generated files land in `lab4/`; the decks under `sim/` are from the 1 fF / 10 fF / 100 fF run only. The deck for the 100 fF to 100 pF sweep was not kept; the plots above are from it.
-- LTspice prints `Pd = 0 is less than W` / `Ps = 0 is less than W` warnings for every MOSFET. The schematic MOSFETs carry no drain/source perimeter, so these are expected and harmless here; they will go away once the sim is run from extracted layout.
-- The schematic-level deck has no parasitics beyond the explicit `{x}` caps.
 
 ---
 
