@@ -1,0 +1,59 @@
+*** SPICE deck for cell simulations_adder{sch} from library Lab5
+*** Created on Wed Oct 21, 2026 22:41:42
+*** Last revised on Fri Nov 06, 2026 10:10:23
+*** Written on Fri Nov 06, 2026 10:10:38 by Electric VLSI Design System, version 9.08
+*** Layout tech: mocmos, foundry MOSIS
+*** UC SPICE *** , MIN_RESIST 4.0, MIN_CAPAC 0.1FF
+
+*** SUBCIRCUIT Lab5__NAND_2 FROM CELL NAND_2{sch}
+.SUBCKT Lab5__NAND_2 A B Y
+** GLOBAL gnd
+** GLOBAL vdd
+Mnmos@0 Y A vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@1 Y B vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@2 Y A net@8 gnd NMOS L=0.6U W=1.8U
+Mnmos@3 net@8 B gnd gnd NMOS L=0.6U W=1.8U
+.ENDS Lab5__NAND_2
+
+*** SUBCIRCUIT Lab5__XOR_2 FROM CELL XOR_2{sch}
+.SUBCKT Lab5__XOR_2 A B Y
+** GLOBAL gnd
+** GLOBAL vdd
+Mnmos@0 notA_output A vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@1 notA_output A gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@2 notB_output B vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@3 notB_output B gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@4 net@25 notB_output vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@5 Y A net@25 vdd PMOS L=0.6U W=1.8U
+Mnmos@6 net@26 B vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@7 Y notA_output net@26 vdd PMOS L=0.6U W=1.8U
+Mnmos@8 Y A net@27 gnd NMOS L=0.6U W=1.8U
+Mnmos@9 net@27 B gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@10 Y notA_output net@28 gnd NMOS L=0.6U W=1.8U
+Mnmos@11 net@28 notB_output gnd gnd NMOS L=0.6U W=1.8U
+.ENDS Lab5__XOR_2
+
+*** SUBCIRCUIT Lab5__full_adder FROM CELL full_adder{sch}
+.SUBCKT Lab5__full_adder A B Cin Cout Sum
+** GLOBAL gnd
+** GLOBAL vdd
+XNAND_2@0 A B n2 Lab5__NAND_2
+XNAND_2@1 n1 Cin n3 Lab5__NAND_2
+XNAND_2@2 n3 n2 Cout Lab5__NAND_2
+XXOR_2@0 A B n1 Lab5__XOR_2
+XXOR_2@1 Cin n1 Sum Lab5__XOR_2
+.ENDS Lab5__full_adder
+
+.global gnd vdd
+
+*** TOP LEVEL CELL: simulations_adder{sch}
+Xfull_add@0 a a cin cout s Lab5__full_adder
+
+* Spice Code nodes in cell cell 'simulations_adder{sch}'
+vdd vdd 0 DC 5
+va a 0 pulse(0v 5v 0n 1n 1n 80n 160n)
+vb b 0 pulse(0v 5v 0n 1n 1n 40n 80n)
+vcin cin 0 pulse(0v 5v 0n 1n 1n 20n 40n)
+.tran 0 160n 0 100p
+.include C5_models.txt
+.END
