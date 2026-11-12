@@ -297,7 +297,7 @@ Evdd||D5G2;|rail@161||P
 X
 
 # Cell ALU4;1{sch}
-CALU4;1{sch}||schematic|1794500000000|1794510812574|
+CALU4;1{sch}||schematic|1794500000000|1794512611676|
 Ngeneric:Facet-Center|art@0||0|0||||AV
 NOff-Page|conn@1||-53.5|15||||
 NOff-Page|conn@8||-29.5|0||||
@@ -392,7 +392,6 @@ Ngeneric:Invisible-Pin|txt@107||304.5|3|1|1|||ART_message(D5G1;)SS
 Ngeneric:Invisible-Pin|txt@108||303|-2.5|1|1|||ART_message(D5G1;)SCout
 Ngeneric:Invisible-Pin|txt@109||330|7|1|1|||ART_message(D5G1.5;)Stri-state
 Ngeneric:Invisible-Pin|txt@115||150|46|1|1|||ART_message(D5G4;)S4-bit Arithmetic Unit
-Ngeneric:Invisible-Pin|txt@116||150|40|1|1|||ART_message(D5G2;)SSub = 0:  S = A + B          Sub = 1:  S = B + ~A + 1  (= B - A)          En = 1: S driven,  En = 0: S is Hi-Z
 IXOR;1{ic}|xor@0||-45.5|20|||D5G4;
 IXOR;1{ic}|xor@1||62.5|20|||D5G4;
 IXOR;1{ic}|xor@2||160|20|||D5G4;
@@ -974,7 +973,7 @@ EY||D5G1.25;X-2;|conn@0|y|O
 X
 
 # Cell TRI;1{ic}
-CTRI;1{ic}||artwork|1794500000000|1794500000000|E
+CTRI;1{ic}||artwork|1794500000000|1794512737261|E
 Ngeneric:Facet-Center|art@0||0|0||||AV
 NBox|art@1||0|0|10|10||
 Nschematic:Bus_Pin|pin@3||-8|2||||
@@ -987,9 +986,9 @@ Ngeneric:Invisible-Pin|txt@2||0|0|1|1|||ART_message(D5G2;)STRI
 Aschematic:wire|net@5|||1800|pin@3||-8|2|pin@4||-5|2
 Aschematic:wire|net@8|||1800|pin@6||-8|-2|pin@7||-5|-2
 Aschematic:wire|net@11|||0|pin@9||8|0|pin@10||5|0
-ED||D5G1.5;X2.5;|pin@3||I
-EEn||D5G1.5;X2.5;|pin@6||I
-EY||D5G1.5;X2.5;|pin@9||O
+ED||D5G1.5;X-1;|pin@3||I
+EEn||D5G1.5;X-1;|pin@6||I
+EY||D5G1.5;X1;|pin@9||O
 X
 
 # Cell TRI;1{lay}
@@ -1108,7 +1107,8 @@ Evdd||D5G2;|well@76||P
 X
 
 # Cell TRI;1{sch}
-CTRI;1{sch}||schematic|1794500000000|1794500000000|
+CTRI;1{sch}||schematic|1794500000000|1794512726895|
+ITRI;1{ic}|TRI@0||-18.5|23.5|||D5G4;
 Ngeneric:Facet-Center|art@0||0|0||||AV
 NOff-Page|conn@9||-10|0||||
 NOff-Page|conn@15||-10|-20||||
@@ -1141,7 +1141,7 @@ NPower|pwr@32||34|19||||
 Ngeneric:Invisible-Pin|txt@49||1|-27|1|1|||ART_message(D5G1.5;)SD inverter
 Ngeneric:Invisible-Pin|txt@50||15|-27|1|1|||ART_message(D5G1.5;)SEn inverter
 Ngeneric:Invisible-Pin|txt@51||33|-27|1|1|||ART_message(D5G1.5;)Soutput stack
-Ngeneric:Invisible-Pin|txt@52||16|27|1|1|||ART_message(D5G2;)STri-state buffer:  Y = D when En = 1,  Y floats (Hi-Z) when En = 0
+Ngeneric:Invisible-Pin|txt@52||13.5|26|1|1|||ART_message(D5G2;)STri-state buffer
 Awire|D|D5G2;||1800|conn@9|y|-8|0|pin@10||-1|0
 Awire|D_bar|D5G1.5;||900|pin@13||2|0|nmos@2|d|2|-6
 Awire|D_bar|D5G1.5;||0|pmos@6|g|31|6|pin@46||26|6

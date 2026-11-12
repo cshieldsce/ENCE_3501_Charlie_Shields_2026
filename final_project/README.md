@@ -52,6 +52,15 @@ Each bit slice is `XOR` → `FA` → `TRI`:
 
 All transistors are 6λ/2λ (W = 1.8 µm, L = 0.6 µm), the same as Lab 5.
 
+### Cell screenshots (Electric)
+
+| Cell | Schematic | Layout |
+|---|---|---|
+| `NOT` | ![](images/el_not_sch.png) | ![](images/el_not_lay.png) |
+| `NAND` | ![](images/el_nand_sch.png) | ![](images/el_nand_lay.png) |
+| `XOR` | ![](images/el_xor_sch.png) | ![](images/el_xor_lay.png) |
+| `FA` | ![](images/el_fa_sch.png) | ![](images/el_fa_lay.png) |
+
 ### Tri-state buffer (`TRI`)
 
 Two inverters make `D_bar` = ~D and `En_bar` = ~En. These drive a clocked-CMOS style stack:
@@ -62,9 +71,9 @@ vdd ─ P(En_bar) ─ P(D_bar) ─ Y ─ N(D_bar) ─ N(En) ─ gnd
 
 When `En` = 1, both outer devices are on and the stack is an inverter of `D_bar`, so Y = D. When `En` = 0, both outer devices are off and Y floats.
 
-![TRI schematic](images/tri_sch.png)
+![TRI schematic](images/el_tri_sch.png)
 
-![TRI layout](images/tri_lay.png)
+![TRI layout](images/el_tri_lay.png)
 
 *`TRI{lay}`: the D inverter, the En inverter, then the 4-transistor stack sharing one diffusion strip on each side. Rails are at the same height as `NOT`/`XOR`. `D_bar`, `En_bar` and `En` cross the cell in metal-2.*
 
