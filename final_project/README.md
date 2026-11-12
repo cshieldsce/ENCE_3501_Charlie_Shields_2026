@@ -89,6 +89,10 @@ Instances are named `XOR_bitN`, `FA_bitN`, `TRI_bitN`.
 
 ![ALU4 layout](images/alu4_lay.png)
 
+![ALU4 layout in 3D](images/el_alu4_3d.png)
+
+*`ALU4{lay}` in Electric's 3D view.*
+
 ![Bit 0 slice](images/slice_lay.png)
 
 *Bit 0 slice. The `XOR` output leaves upward and crosses to the full adder's `A` input in the gap. `Cout` of each `FA` runs right along the top at y = 90 to the next slice's `Cin`. `Sub` and `En` are metal-1 buses under the row.*
