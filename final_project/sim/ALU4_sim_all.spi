@@ -1,0 +1,99 @@
+*** SPICE deck for cell ALU4_sim_all{sch} from library ALU_cs
+*** Created on Thu Nov 12, 2026 09:13:20
+*** Last revised on Thu Nov 12, 2026 09:13:20
+*** Written on Thu Nov 12, 2026 11:16:17 by Electric VLSI Design System, version 9.08
+*** Layout tech: mocmos, foundry MOSIS
+*** lambda = 0.3um (rescaled from batch export: 2/6 lambda -> L=0.6U W=1.8U, same as Electric GUI with ScaleFORmocmos=300)
+*** UC SPICE *** , MIN_RESIST 4.0, MIN_CAPAC 0.1FF
+
+*** SUBCIRCUIT ALU_cs__NAND FROM CELL ALU_cs:NAND{sch}
+.SUBCKT ALU_cs__NAND A B Y
+** GLOBAL gnd
+** GLOBAL vdd
+Mnmos@0 Y A vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@1 Y B vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@2 Y A net@8 gnd NMOS L=0.6U W=1.8U
+Mnmos@3 net@8 B gnd gnd NMOS L=0.6U W=1.8U
+.ENDS ALU_cs__NAND
+
+*** SUBCIRCUIT ALU_cs__XOR FROM CELL ALU_cs:XOR{sch}
+.SUBCKT ALU_cs__XOR A B Y
+** GLOBAL gnd
+** GLOBAL vdd
+Mnmos@0 notA_output A vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@1 notA_output A gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@2 notB_output B vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@3 notB_output B gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@4 net@25 notB_output vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@5 Y A net@25 vdd PMOS L=0.6U W=1.8U
+Mnmos@6 net@26 B vdd vdd PMOS L=0.6U W=1.8U
+Mnmos@7 Y notA_output net@26 vdd PMOS L=0.6U W=1.8U
+Mnmos@8 Y A net@27 gnd NMOS L=0.6U W=1.8U
+Mnmos@9 net@27 B gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@10 Y notA_output net@28 gnd NMOS L=0.6U W=1.8U
+Mnmos@11 net@28 notB_output gnd gnd NMOS L=0.6U W=1.8U
+.ENDS ALU_cs__XOR
+
+*** SUBCIRCUIT ALU_cs__FA FROM CELL ALU_cs:FA{sch}
+.SUBCKT ALU_cs__FA A B Cin Cout Sum
+** GLOBAL gnd
+** GLOBAL vdd
+XNAND_2@0 A B n2 ALU_cs__NAND
+XNAND_2@1 n1 Cin n3 ALU_cs__NAND
+XNAND_2@2 n3 n2 Cout ALU_cs__NAND
+XXOR_2@0 A B n1 ALU_cs__XOR
+XXOR_2@1 Cin n1 Sum ALU_cs__XOR
+.ENDS ALU_cs__FA
+
+*** SUBCIRCUIT ALU_cs__TRI FROM CELL ALU_cs:TRI{sch}
+.SUBCKT ALU_cs__TRI D En Y
+** GLOBAL gnd
+** GLOBAL vdd
+Mnmos@2 D_bar D gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@4 En_bar En gnd gnd NMOS L=0.6U W=1.8U
+Mnmos@7 Y D_bar net@44 gnd NMOS L=0.6U W=1.8U
+Mnmos@8 net@44 En gnd gnd NMOS L=0.6U W=1.8U
+Mpmos@1 D_bar D vdd vdd PMOS L=0.6U W=1.8U
+Mpmos@3 En_bar En vdd vdd PMOS L=0.6U W=1.8U
+Mpmos@5 net@40 En_bar vdd vdd PMOS L=0.6U W=1.8U
+Mpmos@6 Y D_bar net@40 vdd PMOS L=0.6U W=1.8U
+.ENDS ALU_cs__TRI
+
+*** SUBCIRCUIT ALU_cs__ALU4 FROM CELL ALU_cs:ALU4{sch}
+.SUBCKT ALU_cs__ALU4 A0 A1 A2 A3 B0 B1 B2 B3 Cout En S0 S1 S2 S3 Sub
+** GLOBAL gnd
+** GLOBAL vdd
+Xfa@0 net@5 B0 Sub C1 net@12 ALU_cs__FA
+Xfa@1 net@30 B1 C1 C2 net@40 ALU_cs__FA
+Xfa@2 net@58 B2 C2 C3 net@68 ALU_cs__FA
+Xfa@3 net@86 B3 C3 Cout net@96 ALU_cs__FA
+Xtri@0 net@12 En S0 ALU_cs__TRI
+Xtri@1 net@40 En S1 ALU_cs__TRI
+Xtri@2 net@68 En S2 ALU_cs__TRI
+Xtri@3 net@96 En S3 ALU_cs__TRI
+Xxor@0 A0 Sub net@5 ALU_cs__XOR
+Xxor@1 A1 Sub net@30 ALU_cs__XOR
+Xxor@2 A2 Sub net@58 ALU_cs__XOR
+Xxor@3 A3 Sub net@86 ALU_cs__XOR
+.ENDS ALU_cs__ALU4
+
+.global gnd vdd
+
+*** TOP LEVEL CELL: ALU_cs:ALU4_sim_all{sch}
+Xalu@0 A0 A1 A2 A3 B0 B1 B2 B3 Cout En S0 S1 S2 S3 Sub ALU_cs__ALU4
+
+* Spice Code nodes in cell cell 'ALU_cs:ALU4_sim_all{sch}'
+vdd vdd 0 DC 5
+.include C5_models.txt
+vb0 b0 0 PULSE(0 5 19.9n 0.2n 0.2n 19.8n 40n)
+vb1 b1 0 PULSE(0 5 39.9n 0.2n 0.2n 39.8n 80n)
+vb2 b2 0 PULSE(0 5 79.9n 0.2n 0.2n 79.8n 160n)
+vb3 b3 0 PULSE(0 5 159.9n 0.2n 0.2n 159.8n 320n)
+va0 a0 0 PULSE(0 5 319.9n 0.2n 0.2n 319.8n 640n)
+va1 a1 0 PULSE(0 5 639.9n 0.2n 0.2n 639.8n 1280n)
+va2 a2 0 PULSE(0 5 1279.9n 0.2n 0.2n 1279.8n 2560n)
+va3 a3 0 PULSE(0 5 2559.9n 0.2n 0.2n 2559.8n 5120n)
+vsub sub 0 PULSE(0 5 5119.9n 0.2n 0.2n 5119.8n 10240n)
+ven en 0 DC 5
+.tran 0 10240n 0 100p
+.END
