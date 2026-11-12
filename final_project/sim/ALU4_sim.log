@@ -1,6 +1,6 @@
 LTspice 26.0.2 for Windows
-Circuit: Z:\tmp\claude-1000\-home-charlie-School-Y4-Q1-eng3501\f69108bf-cc64-47dc-bca1-f6d17fc02801\scratchpad\work\sim\ALU4_sim.spi
-Start Time: Thu Nov 12 11:16:20 2026
+Circuit: Z:\home\charlie\School\Y4\Q1\eng3501\final_project\sim\ALU4_sim.spi
+Start Time: Thu Nov 12 13:14:46 2026
 Ignoring BSIM parameter XL
 Ignoring BSIM parameter XW
 Ignoring BSIM parameter XL
@@ -18,9 +18,9 @@ Direct Newton iteration failed to find operating point.
 Starting Gmin stepping
 Gmin stepping succeeded in finding the operating point.
 
-Total elapsed time: 1.643 seconds.
+Total elapsed time: 1.782 seconds.
 
 Files loaded:
-Z:\tmp\claude-1000\-home-charlie-School-Y4-Q1-eng3501\f69108bf-cc64-47dc-bca1-f6d17fc02801\scratchpad\work\sim\ALU4_sim.spi
-Z:\tmp\claude-1000\-home-charlie-School-Y4-Q1-eng3501\f69108bf-cc64-47dc-bca1-f6d17fc02801\scratchpad\work\sim\C5_models.txt
+Z:\home\charlie\School\Y4\Q1\eng3501\final_project\sim\ALU4_sim.spi
+Z:\home\charlie\School\Y4\Q1\eng3501\final_project\sim\C5_models.txt
 

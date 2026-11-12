@@ -102,4 +102,8 @@ rl2 s2 mid 100k
 rl3 s3 mid 100k
 rlc cout mid 100k
 .tran 0 400n 0 50p
+* display only: A, B and S as numbers (0-15) for the waveform viewer; these do not load the circuit
+Ba a 0 V=u(V(a0)-2.5)+2*u(V(a1)-2.5)+4*u(V(a2)-2.5)+8*u(V(a3)-2.5)
+Bb b 0 V=u(V(b0)-2.5)+2*u(V(b1)-2.5)+4*u(V(b2)-2.5)+8*u(V(b3)-2.5)
+Bs s 0 V=u(V(s0)-2.5)+2*u(V(s1)-2.5)+4*u(V(s2)-2.5)+8*u(V(s3)-2.5)
 .END

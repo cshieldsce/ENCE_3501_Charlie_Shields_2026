@@ -29,13 +29,9 @@ Each bit slice is `XOR` → `FA` → `TRI`:
 | `Cout` | out | carry out (B ≥ A when subtracting) |
 | `vdd`, `gnd` | | 5 V rails |
 
-![ALU4 schematic](images/alu4_sch.png)
+![ALU4 schematic](images/el_alu4_sch.png)
 
-*`ALU4{sch}`: four `XOR` / `FA` / `TRI` slices, wired directly. Carries between bits are labelled `C1`–`C3`; `Sub` and `En` run along the bottom.*
-
-![ALU4 schematic, bit 0](images/alu4_sch_bit0.png)
-
-*Bit 0 close-up: `A0` and `Sub` into the XOR, the result into the full adder's `A` input, the sum into the tri-state buffer, out to `S0`.*
+*`ALU4{sch}` in Electric: four `XOR` / `FA` / `TRI` slices, wired directly. Carries between bits are labelled `C1`–`C3`.*
 
 ---
 
@@ -129,7 +125,9 @@ Routing rules:
 
 ## Simulation
 
-The decks were written by Electric from the `ALU4_sim` and `ALU4_sim_all` cells, which hold the `ALU4` icon and a SPICE code block.
+The decks were written by Electric from the `ALU4_sim` and `ALU4_sim_all` cells, which hold the `ALU4` icon and a SPICE code block. All waveform figures are LTspice screenshots. Opening a `.raw` in LTspice loads the matching `.plt`, which sets up the same panes.
+
+Each deck also has three display-only behavioral sources, `V(a)`, `V(b)` and `V(s)`, that show A, B and S as numbers (0–15) so the results can be read straight off the plot. They only read the logic nodes and don't load the circuit.
 
 ![Sim schematic](images/sim_sch.png)
 
@@ -144,7 +142,9 @@ rl0..rl3, rlc: 100k from S0..S3 and Cout to 2.5 V   (shows Hi-Z as 2.5 V)
 .include C5_models.txt
 ```
 
-![Test vector simulation](images/sim_demo.png)
+![Test vector simulation](images/lt_demo.png)
+
+*Top to bottom: `Sub` and `En`, A and B as numbers, S as a number, then `S3`..`S0` and `Cout`. After 360 ns the outputs float, so `V(s)` means nothing there.*
 
 | t (ns) | Sub | A | B | S3..S0 | Cout | S low / high |
 |---|---|---|---|---|---|---|
@@ -175,7 +175,9 @@ ven en 0 DC 5
 .tran 0 10240n 0 100p
 ```
 
-![Exhaustive simulation](images/sim_all.png)
+![Exhaustive simulation](images/lt_all.png)
+
+*`Sub`, then A (red, steps) and B (cyan, ramps), then S as a number, then `Cout`.*
 
 `scripts/check_all.py` samples `{Cout, S3..S0}` 1 ns before each step and compares it with A + B or B + ~A + 1:
 
@@ -185,7 +187,11 @@ ven en 0 DC 5
 
 The slowest transition is when a carry ripples through all four bits, for example 13 − 5 coming from 12 − 5 (0111 → 1000). The last output crosses 2.5 V **1.6 ns** after the input edge, with no load. The median over all vectors is 0.75 ns.
 
-![Slowest transition](images/sim_worst.png)
+`ALU4_worst.spi` runs just that transition (Sub = 1, A = 5, B steps 12 → 13 at 1 ns) so it can be plotted on its own:
+
+![Slowest transition](images/lt_worst.png)
+
+*`B0` rises at 1 ns; `S0`, `S1`, `S2` fall one after another as the carry ripples, then `S3` rises. `Cout` stays high.*
 
 ---
 
@@ -193,7 +199,17 @@ The slowest transition is when a carry ripples through all four bits, for exampl
 
 Same two test benches, but run on the netlist Electric extracts from `ALU4{lay}` instead of the schematic. That netlist includes the source/drain area and perimeter of every transistor (AS/AD/PS/PD), so it adds the diffusion capacitance the schematic leaves out.
 
-![Schematic vs layout](images/sim_lay_vs_sch.png)
+![Layout test vectors](images/lt_demo_lay.png)
+
+*`ALU4_lay_sim`: the test vectors on the extracted layout. Same results as the schematic.*
+
+![Layout exhaustive](images/lt_all_lay.png)
+
+*`ALU4_lay_sim_all`: all 512 combinations on the extracted layout.*
+
+![Layout slowest transition](images/lt_worst_lay.png)
+
+*`ALU4_lay_worst`: the same slowest transition on the extracted layout. `S3` settles about 3 ns after the edge instead of 1.6 ns.*
 
 | | Schematic | Layout |
 |---|---|---|
@@ -208,7 +224,7 @@ The layout is about 2× slower because of the extra diffusion capacitance. That 
 
 - **The SPICE decks were exported with Electric in batch mode**, which ignores the library's λ = 300 nm setting and writes L = 0.4U / W = 1.2U. Every device is 2λ/6λ, so the decks were rescaled to L = 0.6U / W = 1.8U, which is what the GUI writes (same as Lab 5). Re-exporting from the GUI (Tools → Simulation (Spice) → Write Spice Deck on `ALU4_sim`) gives the same netlist.
 - **The layout decks were rescaled the same way:** L, W, PS and PD × 1.5 and AS, AD × 2.25. Their model names were changed from `N`/`P` to `NMOS`/`PMOS` to match `C5_models.txt`, and `gnd` is tied to node 0.
-- **The exhaustive `.raw` files aren't included** (about 20 MB each). Re-run `ltspice -b sim/ALU4_sim_all.spi` (or `ALU4_lay_sim_all.spi`) (about 20 s), then `python3 scripts/check_all.py sim/ALU4_sim_all.raw`.
+- **The exhaustive `.raw` files aren't included** (23 MB and 52 MB, so `.gitignore` skips them). Re-run `ltspice -b sim/ALU4_sim_all.spi` (or `ALU4_lay_sim_all.spi`) (about 20 s), then `python3 scripts/check_all.py sim/ALU4_sim_all.raw`.
 - **`scripts/gen_alu_cs.py` generated `ALU_cs.jelib` from `lab5/Lab5.jelib`.** It copies the Lab 5 cells and adds `TRI`, `ALU4` and the sim cells.
 
 ## Files
@@ -220,5 +236,7 @@ The layout is about 2× slower because of the extra diffusion capacitance. That 
 | `sim/ALU4_sim_all.spi`, `.log` | Exhaustive deck |
 | `sim/C5_models.txt` | C5 SPICE models |
 | `sim/ALU4_lay_sim.spi`, `ALU4_lay_sim_all.spi` | Same decks run on the extracted layout netlist |
-| `scripts/` | Library generator, LTspice `.raw` reader, exhaustive checker, settle-time measurement |
+| `sim/ALU4_worst.spi`, `ALU4_lay_worst.spi` | Slowest transition only, schematic and layout |
+| `sim/*.plt` | LTspice plot settings for each deck |
+| `scripts/` | Library generator, LTspice `.raw` reader, exhaustive checker, settle-time measurement, `.plt` generator |
 | `images/` | Figures |

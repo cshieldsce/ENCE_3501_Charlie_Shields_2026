@@ -1,6 +1,6 @@
 LTspice 26.0.2 for Windows
-Circuit: Z:\tmp\claude-1000\-home-charlie-School-Y4-Q1-eng3501\f69108bf-cc64-47dc-bca1-f6d17fc02801\scratchpad\work\sim\ALU4_sim_all.spi
-Start Time: Thu Nov 12 11:16:23 2026
+Circuit: Z:\home\charlie\School\Y4\Q1\eng3501\final_project\sim\ALU4_sim_all.spi
+Start Time: Thu Nov 12 13:14:50 2026
 Ignoring BSIM parameter XL
 Ignoring BSIM parameter XW
 Ignoring BSIM parameter XL
@@ -15,9 +15,9 @@ Warning: Ps = 0 is less than W.
 Warning: Pd = 0 is less than W.
 Warning: Ps = 0 is less than W.
 Direct Newton iteration succeeded in finding operating point.
-Total elapsed time: 35.940 seconds.
+Total elapsed time: 68.261 seconds.
 
 Files loaded:
-Z:\tmp\claude-1000\-home-charlie-School-Y4-Q1-eng3501\f69108bf-cc64-47dc-bca1-f6d17fc02801\scratchpad\work\sim\ALU4_sim_all.spi
-Z:\tmp\claude-1000\-home-charlie-School-Y4-Q1-eng3501\f69108bf-cc64-47dc-bca1-f6d17fc02801\scratchpad\work\sim\C5_models.txt
+Z:\home\charlie\School\Y4\Q1\eng3501\final_project\sim\ALU4_sim_all.spi
+Z:\home\charlie\School\Y4\Q1\eng3501\final_project\sim\C5_models.txt
 

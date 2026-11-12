@@ -80,4 +80,8 @@ va3 a3 0 PULSE(0 5 2559.9n 0.2n 0.2n 2559.8n 5120n)
 vsub sub 0 PULSE(0 5 5119.9n 0.2n 0.2n 5119.8n 10240n)
 ven en 0 DC 5
 .tran 0 10240n 0 100p
+* display only: A, B and S as numbers (0-15) for the waveform viewer; these do not load the circuit
+Ba a 0 V=u(V(a0)-2.5)+2*u(V(a1)-2.5)+4*u(V(a2)-2.5)+8*u(V(a3)-2.5)
+Bb b 0 V=u(V(b0)-2.5)+2*u(V(b1)-2.5)+4*u(V(b2)-2.5)+8*u(V(b3)-2.5)
+Bs s 0 V=u(V(s0)-2.5)+2*u(V(s1)-2.5)+4*u(V(s2)-2.5)+8*u(V(s3)-2.5)
 .END

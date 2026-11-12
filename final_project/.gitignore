@@ -1,0 +1,4 @@
+exports/
+sim/*_all.raw
+sim/*.op.raw
+__pycache__/

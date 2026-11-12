@@ -1,0 +1,84 @@
+*** SPICE deck for cell ALU4{lay} from library ALU_cs
+*** Created on Thu Nov 12, 2026 09:13:20
+*** Last revised on Thu Nov 12, 2026 09:13:20
+*** Written on Thu Nov 12, 2026 11:57:10 by Electric VLSI Design System, version 9.08
+*** Layout tech: mocmos, foundry MOSIS
+*** extracted from ALU4{lay}; lambda = 0.3um (batch export rescaled: L,W,PS,PD x1.5, AS,AD x2.25)
+*** UC SPICE *** , MIN_RESIST 4.0, MIN_CAPAC 0.1FF
+
+*** SUBCIRCUIT ALU_cs__NAND FROM CELL ALU_cs:NAND{lay}
+.SUBCKT ALU_cs__NAND A B gnd vdd Y
+Mnmos@0 net@12 B gnd gnd NMOS L=0.6U W=1.8U AS=23.18P AD=3.915P PS=30.75U PD=6.15U
+Mnmos@1 Y A net@12 gnd NMOS L=0.6U W=1.8U AS=3.915P AD=4.606P PS=6.15U PD=7.55U
+Mpmos@0 Y B vdd vdd PMOS L=0.6U W=1.8U AS=14.36P AD=4.606P PS=20.25U PD=7.55U
+Mpmos@1 vdd A Y vdd PMOS L=0.6U W=1.8U AS=4.606P AD=14.36P PS=7.55U PD=20.25U
+.ENDS ALU_cs__NAND
+
+*** SUBCIRCUIT ALU_cs__XOR FROM CELL ALU_cs:XOR{lay}
+.SUBCKT ALU_cs__XOR A B gnd vdd Y
+Mnmos@0 net@13 A gnd gnd NMOS L=0.6U W=1.8U AS=30.11P AD=5.535P PS=34.2U PD=9.75U
+Mnmos@1 net@17 B gnd gnd NMOS L=0.6U W=1.8U AS=30.11P AD=5.535P PS=34.2U PD=9.75U
+Mnmos@2 net@29 B gnd gnd NMOS L=0.6U W=1.8U AS=30.11P AD=3.915P PS=34.2U PD=6.15U
+Mnmos@3 Y A net@29 gnd NMOS L=0.6U W=1.8U AS=3.915P AD=3.915P PS=6.15U PD=6.15U
+Mnmos@4 net@33 net@13 Y gnd NMOS L=0.6U W=1.8U AS=3.915P AD=3.915P PS=6.15U PD=6.15U
+Mnmos@5 gnd net@17 net@33 gnd NMOS L=0.6U W=1.8U AS=3.915P AD=30.11P PS=6.15U PD=34.2U
+Mpmos@0 net@13 A vdd vdd PMOS L=0.6U W=1.8U AS=30.11P AD=5.535P PS=34.2U PD=9.75U
+Mpmos@1 net@17 B vdd vdd PMOS L=0.6U W=1.8U AS=30.11P AD=5.535P PS=34.2U PD=9.75U
+Mpmos@2 net@21 net@17 vdd vdd PMOS L=0.6U W=1.8U AS=30.11P AD=3.915P PS=34.2U PD=6.15U
+Mpmos@3 Y A net@21 vdd PMOS L=0.6U W=1.8U AS=3.915P AD=3.915P PS=6.15U PD=6.15U
+Mpmos@4 net@25 net@13 Y vdd PMOS L=0.6U W=1.8U AS=3.915P AD=3.915P PS=6.15U PD=6.15U
+Mpmos@5 vdd B net@25 vdd PMOS L=0.6U W=1.8U AS=3.915P AD=30.11P PS=6.15U PD=34.2U
+.ENDS ALU_cs__XOR
+
+*** SUBCIRCUIT ALU_cs__FA FROM CELL ALU_cs:FA{lay}
+.SUBCKT ALU_cs__FA A B Cin Cout gnd Sum vdd
+XNAND_2@0 A B gnd vdd net@25 ALU_cs__NAND
+XNAND_2@1 net@23 Cin gnd vdd net@27 ALU_cs__NAND
+XNAND_2@2 net@27 net@25 gnd vdd Cout ALU_cs__NAND
+XXOR_2@0 A B gnd vdd net@23 ALU_cs__XOR
+XXOR_2@1 Cin net@23 gnd vdd Sum ALU_cs__XOR
+.ENDS ALU_cs__FA
+
+*** SUBCIRCUIT ALU_cs__TRI FROM CELL ALU_cs:TRI{lay}
+.SUBCKT ALU_cs__TRI D En gnd vdd Y
+Mnmos@16 net@18 D gnd gnd NMOS L=0.6U W=1.8U AS=8.055P AD=5.535P PS=13.55U PD=9.75U
+Mnmos@22 net@24 En gnd gnd NMOS L=0.6U W=1.8U AS=8.055P AD=5.535P PS=13.55U PD=9.75U
+Mnmos@28 net@32 En gnd gnd NMOS L=0.6U W=1.8U AS=8.055P AD=3.915P PS=13.55U PD=6.15U
+Mnmos@34 Y net@18 net@32 gnd NMOS L=0.6U W=1.8U AS=3.915P AD=5.535P PS=6.15U PD=9.75U
+Mpmos@15 net@18 D vdd vdd PMOS L=0.6U W=1.8U AS=8.055P AD=5.535P PS=13.55U PD=9.75U
+Mpmos@21 net@24 En vdd vdd PMOS L=0.6U W=1.8U AS=8.055P AD=5.535P PS=13.55U PD=9.75U
+Mpmos@27 net@30 net@24 vdd vdd PMOS L=0.6U W=1.8U AS=8.055P AD=3.915P PS=13.55U PD=6.15U
+Mpmos@33 Y net@18 net@30 vdd PMOS L=0.6U W=1.8U AS=3.915P AD=5.535P PS=6.15U PD=9.75U
+.ENDS ALU_cs__TRI
+
+*** TOP LEVEL CELL: ALU_cs:ALU4{lay}
+XFA_bit0 net@11 B0 Sub net@59 gnd net@28 vdd ALU_cs__FA
+XFA_bit1 net@47 B1 net@59 net@96 gnd net@65 vdd ALU_cs__FA
+XFA_bit2 net@84 B2 net@96 net@133 gnd net@102 vdd ALU_cs__FA
+XFA_bit3 net@121 B3 net@133 Cout gnd net@139 vdd ALU_cs__FA
+XTRI_bit0 net@28 En gnd vdd S0 ALU_cs__TRI
+XTRI_bit1 net@65 En gnd vdd S1 ALU_cs__TRI
+XTRI_bit2 net@102 En gnd vdd S2 ALU_cs__TRI
+XTRI_bit3 net@139 En gnd vdd S3 ALU_cs__TRI
+XXOR_bit0 A0 Sub gnd vdd net@11 ALU_cs__XOR
+XXOR_bit1 A1 Sub gnd vdd net@47 ALU_cs__XOR
+XXOR_bit2 A2 Sub gnd vdd net@84 ALU_cs__XOR
+XXOR_bit3 A3 Sub gnd vdd net@121 ALU_cs__XOR
+
+vgnd gnd 0 DC 0
+* Slowest transition from the exhaustive run: Sub = 1, A = 5 (0101), B steps 12 -> 13 at 1 ns.
+* S = B - A goes 0111 -> 1000, so the carry ripples through all four bits. No load, same as the exhaustive run.
+vdd vdd 0 DC 5
+.include C5_models.txt
+va0 a0 0 DC 5
+va1 a1 0 DC 0
+va2 a2 0 DC 5
+va3 a3 0 DC 0
+vb0 b0 0 PULSE(0 5 1n 0.2n 0.2n 10n 20n)
+vb1 b1 0 DC 0
+vb2 b2 0 DC 5
+vb3 b3 0 DC 5
+vsub sub 0 DC 5
+ven en 0 DC 5
+.tran 0 5n 0 5p
+.END
