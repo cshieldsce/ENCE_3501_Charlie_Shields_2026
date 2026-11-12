@@ -89,6 +89,10 @@ Instances are named `XOR_bitN`, `FA_bitN`, `TRI_bitN`.
 
 ![ALU4 layout](images/alu4_lay.png)
 
+![ALU4 top level in Electric](images/el_alu4_lay.png)
+
+*The top level in Electric, with each cell drawn as its outline so the routing between cells shows.*
+
 ![ALU4 layout in 3D](images/el_alu4_3d.png)
 
 *`ALU4{lay}` in Electric's 3D view.*
