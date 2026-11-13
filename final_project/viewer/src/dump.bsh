@@ -1,0 +1,170 @@
+import com.sun.electric.database.hierarchy.*;
+import com.sun.electric.database.topology.*;
+import com.sun.electric.database.geometry.*;
+import com.sun.electric.database.network.*;
+import com.sun.electric.database.variable.*;
+import com.sun.electric.technology.*;
+import com.sun.electric.tool.io.*;
+import com.sun.electric.tool.io.input.*;
+import com.sun.electric.tool.ncc.*;
+import java.util.*;
+import java.io.*;
+import java.awt.geom.*;
+
+LIBPATH = "/home/charlie/School/Y4/Q1/eng3501/final_project/ALU_cs.jelib";
+OUTPATH = "/home/charlie/School/Y4/Q1/eng3501/final_project/viewer/src/design.json";
+CELLS = new String[]{"NOT", "NAND", "XOR", "FA", "TRI", "ALU4"};
+
+lib = LibraryFiles.readLibrary(com.sun.electric.database.EditingPreferences.getInstance(), com.sun.electric.database.text.TextUtils.makeURLToFile(LIBPATH), "ALU_cs", FileType.JELIB, true);
+out = new PrintWriter(new FileWriter(OUTPATH));
+
+String q(String s) {
+  if (s == null) return "null";
+  return "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+}
+String num(double d) { return String.valueOf(Math.round(d * 100.0) / 100.0); }
+String netName(Network n) { return n == null ? null : n.describe(false); }
+
+String polyJson(Poly p, AffineTransform t, String net, String dev) {
+  StringBuilder sb = new StringBuilder("{");
+  layer = p.getLayer();
+  sb.append("\"l\":" + q(layer == null ? "none" : layer.getName()));
+  sb.append(",\"s\":" + q(p.getStyle().name()));
+  sb.append(",\"p\":[");
+  Point2D[] pts = p.getPoints();
+  for (int i = 0; i < pts.length; i++) {
+    Point2D r = t.transform(pts[i], null);
+    if (i > 0) sb.append(",");
+    sb.append(num(r.getX()) + "," + num(r.getY()));
+  }
+  sb.append("]");
+  if (p.getString() != null) sb.append(",\"t\":" + q(p.getString()));
+  if (net != null) sb.append(",\"n\":" + q(net));
+  if (dev != null) sb.append(",\"d\":" + q(dev));
+  sb.append("}");
+  return sb.toString();
+}
+
+String matrix(AffineTransform t) {
+  double[] m = new double[6]; t.getMatrix(m);
+  return "[" + num(m[0]) + "," + num(m[1]) + "," + num(m[2]) + "," + num(m[3]) + "," + num(m[4]) + "," + num(m[5]) + "]";
+}
+
+String rect(Rectangle2D b) {
+  return "[" + num(b.getMinX()) + "," + num(b.getMinY()) + "," + num(b.getWidth()) + "," + num(b.getHeight()) + "]";
+}
+
+void dumpCell(Cell c, boolean last) {
+  Netlist nl = c.getNetlist();
+  out.println(q(c.getName() + "{" + c.getView().getAbbreviation() + "}") + ":{");
+  out.println("\"bounds\":" + rect(c.getBounds()) + ",");
+  AffineTransform id = new AffineTransform();
+  List shapes = new ArrayList();
+  List insts = new ArrayList();
+  List texts = new ArrayList();
+  List devs = new ArrayList();
+  for (Iterator it = c.getNodes(); it.hasNext();) {
+    NodeInst ni = it.next();
+    if (ni.isCellInstance()) {
+      Cell sub = (Cell) ni.getProto();
+      AffineTransform t = ni.translateOut(ni.rotateOut());
+      String nm = ni.getName();
+      insts.add("{\"name\":" + q(nm) + ",\"cell\":" + q(sub.getName() + "{" + sub.getView().getAbbreviation() + "}") + ",\"m\":" + matrix(t) + ",\"b\":" + rect(ni.getBounds()) + "}");
+      continue;
+    }
+    proto = ni.getProto();
+    pname = proto.getName();
+    if (pname.equals("Facet-Center")) continue;
+    String dev = null; String net = null;
+    if (ni.getFunction().isTransistor()) {
+      dev = ni.getName();
+      StringBuilder pn = new StringBuilder();
+      for (Iterator pi = proto.getPorts(); pi.hasNext();) {
+        pp = pi.next();
+        if (pn.length() > 0) pn.append(",");
+        pn.append(q(pp.getName()) + ":" + q(netName(nl.getNetwork(ni, pp, 0))));
+      }
+      devs.add("{\"name\":" + q(dev) + ",\"p\":" + (ni.getFunction().isPTypeTransistor() ? "1" : "0") + ",\"x\":" + num(ni.getAnchorCenterX()) + ",\"y\":" + num(ni.getAnchorCenterY()) + ",\"ports\":{" + pn + "}}");
+    }
+    else if (proto.getNumPorts() > 0) {
+      net = netName(nl.getNetwork(ni, proto.getPort(0), 0));
+    }
+    AffineTransform t = ni.rotateOut();
+    Poly[] ps = proto.getTechnology().getShapeOfNode(ni);
+    for (Poly p : ps) shapes.add(polyJson(p, t, net, dev));
+    msg = ni.getVar("ART_message");
+    if (msg != null) {
+      double sz = msg.getTextDescriptor().getSize().getSize();
+      texts.add("{\"t\":" + q(msg.getObject().toString()) + ",\"x\":" + num(ni.getAnchorCenterX()) + ",\"y\":" + num(ni.getAnchorCenterY()) + ",\"sz\":" + num(sz) + "}");
+    }
+  }
+  for (Iterator it = c.getArcs(); it.hasNext();) {
+    ArcInst ai = it.next();
+    String net = netName(nl.getNetwork(ai, 0));
+    Poly[] ps = ai.getProto().getTechnology().getShapeOfArc(ai);
+    for (Poly p : ps) shapes.add(polyJson(p, id, net, null));
+    if (!ai.getNameKey().isTempname()) {
+      Point2D ctr = ai.getTrueCenter();
+      double sz = ai.getTextDescriptor(ArcInst.ARC_NAME).getSize().getSize();
+      texts.add("{\"t\":" + q(ai.getName()) + ",\"x\":" + num(ctr.getX()) + ",\"y\":" + num(ctr.getY()) + ",\"sz\":" + num(sz) + ",\"arc\":1,\"n\":" + q(net) + "}");
+    }
+  }
+  out.println("\"shapes\":[" + String.join(",\n", shapes) + "],");
+  out.println("\"insts\":[" + String.join(",\n", insts) + "],");
+  out.println("\"texts\":[" + String.join(",\n", texts) + "],");
+  out.println("\"devs\":[" + String.join(",\n", devs) + "],");
+  List exps = new ArrayList();
+  for (Iterator it = c.getExports(); it.hasNext();) {
+    e = it.next();
+    Point2D pt = e.getOriginalPort().getCenter();
+    double sz = e.getTextDescriptor(com.sun.electric.database.hierarchy.Export.EXPORT_NAME).getSize().getSize();
+    exps.add("{\"name\":" + q(e.getName()) + ",\"x\":" + num(pt.getX()) + ",\"y\":" + num(pt.getY()) + ",\"sz\":" + num(sz) + ",\"dir\":" + q(e.getCharacteristic().getName()) + ",\"n\":" + q(netName(nl.getNetwork(e, 0))) + "}");
+  }
+  out.println("\"exports\":[" + String.join(",\n", exps) + "],");
+  List nets = new ArrayList();
+  for (Iterator it = nl.getNetworks(); it.hasNext();) { Network n = it.next(); nets.add(q(netName(n))); }
+  out.println("\"nets\":[" + String.join(",", nets) + "]");
+  out.println(last ? "}" : "},");
+}
+
+out.println("{\"cells\":{");
+List all = new ArrayList();
+for (String cn : CELLS) { all.add(cn + "{sch}"); all.add(cn + "{lay}"); all.add(cn + "{ic}"); }
+for (int i = 0; i < all.size(); i++) {
+  Cell c = lib.findNodeProto((String) all.get(i));
+  dumpCell(c, i == all.size() - 1);
+}
+out.println("},");
+
+// NCC equivalence per cell pair: schematic net / device -> layout net / device
+out.println("\"equiv\":{");
+for (int k = 0; k < CELLS.length; k++) {
+  String cn = CELLS[k];
+  Cell sch = lib.findNodeProto(cn + "{sch}"); Cell lay = lib.findNodeProto(cn + "{lay}");
+  NccOptions opt = new NccOptions(); opt.operation = NccOptions.HIER_EACH_CELL; opt.howMuchStatus = 0;
+  res = Ncc.compare(sch, VarContext.globalContext, lay, VarContext.globalContext, opt);
+  rr = res.getResultFromRootCells();
+  eq = rr.getEquivalence();
+  List netPairs = new ArrayList();
+  for (Iterator it = sch.getNetlist().getNetworks(); it.hasNext();) {
+    Network n = it.next();
+    try {
+      px = eq.findEquivalentNet(VarContext.globalContext, n);
+      if (px != null && px.getNet() != null) netPairs.add("[" + q(netName(n)) + "," + q(netName(px.getNet())) + "]");
+    } catch (Exception ex) { }
+  }
+  List nodePairs = new ArrayList();
+  for (Iterator it = sch.getNodes(); it.hasNext();) {
+    NodeInst ni = it.next();
+    if (!(ni.isCellInstance() || ni.getFunction().isTransistor())) continue;
+    if (ni.isCellInstance() && ((Cell) ni.getProto()).isIconOf(sch)) continue;
+    try {
+      px = eq.findEquivalentNode(VarContext.globalContext, ni);
+      if (px != null && px.getNodable() != null) nodePairs.add("[" + q(ni.getName()) + "," + q(px.getNodable().getName()) + "]");
+    } catch (Exception ex) { }
+  }
+  out.println(q(cn) + ":{\"match\":" + rr.match() + ",\"nets\":[" + String.join(",", netPairs) + "],\"nodes\":[" + String.join(",", nodePairs) + "]}" + (k == CELLS.length - 1 ? "" : ","));
+}
+out.println("}}");
+out.close();
+print("DUMPDONE");

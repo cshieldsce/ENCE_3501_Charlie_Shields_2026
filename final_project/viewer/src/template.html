@@ -1,0 +1,631 @@
+<title>ALU4 Design Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a dark EDA workbench. Sidebar of notes and hierarchy on the left, schematic over layout on the right,
+   both canvases black like Electric so the real layer colours read the same as in the tool. */
+:root {
+  --bg: #12151b;          /* page shell, blue-biased near black */
+  --panel: #1a1f27;       /* sidebar and pane headers */
+  --line: #2a313d;        /* hairlines */
+  --fg: #e6e9ef;          /* main text */
+  --muted: #8d96a6;       /* secondary text */
+  --canvas: #000000;      /* drawing ground, as in Electric */
+  --hl: #ffc93c;          /* selection: amber, distinct from every layer colour */
+  --ok: #5fd38d;          /* LVS match */
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; margin: 0; overflow: hidden; }
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--hl); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: minmax(280px, 340px) 1fr; grid-template-rows: auto 1fr; height: 100%;
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+header { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--line); background: var(--panel); }
+header h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
+header h1 span { color: var(--muted); font-weight: 500; }
+.crumbs { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-family: var(--mono); font-size: 13px; min-width: 0; }
+.crumbs button { background: none; border: 1px solid transparent; border-radius: 4px; padding: 3px 7px; cursor: pointer; color: var(--muted); }
+.crumbs button:hover { border-color: var(--line); color: var(--fg); }
+.crumbs button[aria-current] { color: var(--fg); background: #232a35; }
+.crumbs .sep { color: #4b5463; }
+.hdr-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.kbd { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.btn { background: #232a35; border: 1px solid var(--line); border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 13px; }
+.btn:hover { border-color: #3d4656; }
+.btn.primary { background: var(--hl); color: #1a1405; border-color: var(--hl); font-weight: 600; }
+.btn:disabled { opacity: .4; cursor: default; }
+
+aside { border-right: 1px solid var(--line); background: var(--panel); overflow-y: auto; min-width: 0;
+  padding-block: 14px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; display: flex; flex-direction: column; gap: 18px; }
+aside h2 { margin: 0; font-size: 22px; font-weight: 700; text-wrap: balance; }
+aside h3 { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.lede { margin: 4px 0 0; color: var(--muted); line-height: 1.5; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { border: 1px solid var(--line); border-radius: 6px; padding: 7px 8px; }
+.stat b { display: block; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 11px; color: var(--muted); }
+.notes p { margin: 0 0 8px; line-height: 1.55; }
+.notes ul { margin: 0 0 8px; padding-left: 18px; line-height: 1.55; }
+.notes code, .sel code { font-family: var(--mono); font-size: 12.5px; background: #232a35; padding: 1px 4px; border-radius: 3px; }
+table.tt { border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+table.tt th, table.tt td { border: 1px solid var(--line); padding: 3px 9px; text-align: center; }
+table.tt th { color: var(--muted); font-weight: 500; }
+table.tt td.o { color: var(--hl); }
+.sel { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #151a21; }
+.sel.on { border-color: var(--hl); }
+.sel .kind { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--hl); font-weight: 600; }
+.sel .pair { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 8px 0; font-size: 13px; }
+.sel .pair span { color: var(--muted); }
+.sel .pair b { font-family: var(--mono); font-weight: 500; overflow-wrap: anywhere; }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ok); }
+.badge.no { color: var(--muted); }
+.hint { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+.tree { font-family: var(--mono); font-size: 12.5px; }
+.tree ul { list-style: none; margin: 0; padding-left: 14px; border-left: 1px solid var(--line); }
+.tree > ul { padding-left: 0; border: 0; }
+.tree li { margin: 1px 0; }
+.tree button { background: none; border: 0; padding: 2px 6px; border-radius: 4px; cursor: pointer; color: var(--muted); text-align: left; }
+.tree button:hover { color: var(--fg); background: #232a35; }
+.tree button[aria-current] { color: #1a1405; background: var(--hl); }
+.tree .cellname { color: #5f6878; }
+.palette { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.comp { display: flex; flex-direction: column; align-items: stretch; gap: 4px; background: #000; border: 1px solid var(--line); border-radius: 6px; padding: 6px 6px 5px; cursor: pointer; }
+.comp:hover { border-color: #46506066; border-color: #4a5466; }
+.comp[aria-current] { border-color: var(--hl); }
+.comp svg { width: 100%; height: 64px; display: block; }
+.comp span { font-family: var(--mono); font-size: 12px; color: var(--fg); text-align: center; }
+.comp small { font-size: 10.5px; color: var(--muted); text-align: center; margin-top: -3px; }
+.chip { font-family: var(--mono); font-size: 12.5px; color: #1a1405; background: var(--hl); border-radius: 4px; padding: 1px 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+.pane-h .legend { margin-left: auto; }
+.pane-h .legend + .tools { margin-left: 0; }
+.xbg { fill: #070a10; stroke: var(--hl); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-dasharray: 7 4; cursor: pointer; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+main { display: grid; grid-template-rows: 1fr 1fr; min-height: 0; min-width: 0; }
+.pane { position: relative; display: flex; flex-direction: column; min-height: 0; border-bottom: 1px solid var(--line); }
+.pane-h { display: flex; align-items: center; gap: 10px; padding: 6px 12px; padding-right: max(12px, env(safe-area-inset-right, 0px)); background: var(--panel); border-bottom: 1px solid var(--line); }
+.pane-h .t { font-weight: 600; }
+.pane-h .c { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.pane-h .tools { margin-left: auto; display: flex; gap: 6px; }
+.pane-h .tools .btn { padding: 3px 9px; }
+.stage { flex: 1; min-height: 0; background: var(--canvas); position: relative; touch-action: none; }
+.stage svg { width: 100%; height: 100%; display: block; cursor: grab; user-select: none; -webkit-user-select: none; }
+.stage svg.drag { cursor: grabbing; }
+.tip { position: absolute; pointer-events: none; background: #0b0d11ee; border: 1px solid #3a4250; border-radius: 4px; padding: 3px 7px;
+  font-family: var(--mono); font-size: 12px; color: var(--fg); white-space: nowrap; transform: translate(12px, 12px); z-index: 2; }
+
+/* schematic drawing */
+.sch .w { fill: none; stroke: #4f7dff; stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.sch .n { fill: none; stroke: #ff5b52; stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.sch .g { fill: none; stroke: #e8e3d8; stroke-width: 1.4px; vector-effect: non-scaling-stroke; }
+.sch .dot { fill: #4f7dff; stroke: none; }
+.sch text { fill: #e8e3d8; font-family: var(--sans); }
+.sch text.exp { fill: #ff8a84; }
+.sch text.arcname { fill: #8fb0ff; }
+.hit { fill: none; stroke: transparent; stroke-width: 12px; vector-effect: non-scaling-stroke; pointer-events: stroke; cursor: pointer; }
+.ihit { fill: #ffffff; fill-opacity: 0; stroke: none; pointer-events: all; cursor: pointer; }
+.ihit:hover { fill-opacity: .06; }
+.ihit.hl { fill: var(--hl); fill-opacity: .12; stroke: var(--hl); stroke-width: 2px; vector-effect: non-scaling-stroke; stroke-dasharray: 6 4; }
+.sch .hl.w, .sch .hl.n, .sch .hl.g { stroke: var(--hl); stroke-width: 3px; }
+.sch .hl.dot { fill: var(--hl); }
+.sch text.hl { fill: var(--hl); font-weight: 600; }
+.has-sel .shp:not(.hl) { opacity: .32; }
+.has-sel .inst:not(.hl) { opacity: .45; }
+.has-sel .inst.hl { opacity: 1; }
+
+/* layout drawing: Electric mocmos colours */
+.lay .shp { stroke: none; }
+.lay .nwell { fill: #6b5d2a; fill-opacity: .22; }
+.lay .pwell { fill: #2f5d3a; fill-opacity: .22; }
+.lay .sel_ { fill: none; }
+.lay .act { fill: #6be260; fill-opacity: .82; }
+.lay .poly { fill: #ff7faa; fill-opacity: .85; }
+.lay .cut { fill: #1c1c1c; stroke: #a7a7a7; stroke-width: .6px; vector-effect: non-scaling-stroke; }
+.lay .m1 { fill: #60d1ff; fill-opacity: .72; }
+.lay .via { fill: #d8d8d8; fill-opacity: .9; }
+.lay .m2 { fill: #e35fff; fill-opacity: .62; }
+.lay .shp.hl { fill: var(--hl); fill-opacity: .95; stroke: #fff3c4; stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.lay text { fill: #ffffff; font-family: var(--mono); font-weight: 500; paint-order: stroke; stroke: #000; stroke-width: 2px; vector-effect: non-scaling-stroke; }
+.lay text.hl { fill: var(--hl); }
+.has-sel.lay .shp:not(.hl) { opacity: .4; }
+
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .app { grid-template-columns: 1fr; grid-template-rows: auto auto auto; height: auto; }
+  main { order: 2; grid-template-rows: 60vh 60vh; }
+  aside { order: 3; border-right: 0; border-top: 1px solid var(--line); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .hdr-right .kbd { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .shp, .inst { transition: opacity .15s; }
+}
+</style>
+
+<div class="app">
+  <header>
+    <h1>ALU4 <span>design explorer</span></h1>
+    <nav class="crumbs" id="crumbs" aria-label="Hierarchy path"></nav>
+    <div class="hdr-right">
+      <span class="kbd">Click a block to expand · click again to open · Z zoom · F fit · Esc back</span>
+      <button class="btn" id="up" type="button">Up one level</button>
+    </div>
+  </header>
+
+  <aside>
+    <section>
+      <h3>Components</h3>
+      <div class="palette" id="palette"></div>
+    </section>
+    <section>
+      <h3>Hierarchy</h3>
+      <div class="tree" id="tree"></div>
+    </section>
+  </aside>
+
+  <main>
+    <section class="pane">
+      <div class="pane-h"><span class="t">Schematic</span><span class="c" id="schName"></span><span class="chip" id="schSel" hidden></span>
+        <div class="tools"><button class="btn" type="button" data-zoom>Zoom to selection</button><button class="btn" type="button" data-fit="sch">Fit</button></div></div>
+      <div class="stage" id="schStage"><svg id="schSvg" class="sch" role="img" aria-label="Schematic"></svg><div class="tip" id="schTip" hidden></div></div>
+    </section>
+    <section class="pane">
+      <div class="pane-h"><span class="t">Layout</span><span class="c" id="layName"></span><span class="chip" id="laySel" hidden></span>
+        <div class="legend" aria-label="Layer colours"><span><i style="background:#60d1ff"></i>M1</span><span><i style="background:#e35fff"></i>M2</span><span><i style="background:#ff7faa"></i>Poly</span><span><i style="background:#6be260"></i>Active</span><span><i style="background:#d8d8d8"></i>Via</span></div>
+        <div class="tools"><button class="btn" type="button" data-fit="lay">Fit</button></div></div>
+      <div class="stage" id="layStage"><svg id="laySvg" class="lay" role="img" aria-label="Layout"></svg><div class="tip" id="layTip" hidden></div></div>
+    </section>
+  </main>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const C = DATA.cells, EQ = DATA.equiv;
+const NS = 'http://www.w3.org/2000/svg';
+const LAMBDA_UM = 0.3;
+
+// ---------- helpers ----------
+const base = k => k.replace(/\{.*\}$/, '');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const cssq = s => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).replace(/(["\\])/g, '\\$1');
+const netLabel = n => { if (!n) return '—'; const p = n.split('/'); return p.length > 1 ? `${p[0]} (${p.slice(1).join(', ')})` : n; };
+const f = v => Math.round(v * 100) / 100;
+function invert(m) { const r = {}; for (const k in m) r[m[k]] = k; return r; }
+const EQR = {};
+for (const k in EQ) EQR[k] = { nets: invert(EQ[k].nets), nodes: invert(EQ[k].nodes) };
+
+function devCount(cellKey) {
+  const c = C[cellKey]; if (!c) return 0;
+  let n = c.devs.length;
+  for (const i of c.insts) n += devCount(base(i.cell) + '{lay}');
+  return n;
+}
+function isSelfIcon(cellBase, inst) { return base(inst.cell) === cellBase; }
+function childInsts(cellBase) {
+  // instances that are real sub-blocks (skip the cell's own icon drawn on its schematic), paired through NCC
+  const sch = C[cellBase + '{sch}'];
+  const ord = { XOR: 0, FA: 1, TRI: 2, NAND: 3, NOT: 4 };
+  const num = n => +(/@(\d+)$/.exec(n) || [0, 0])[1];
+  return sch.insts.filter(i => !isSelfIcon(cellBase, i))
+    .map(i => ({ sch: i.name, lay: EQ[cellBase].nodes[i.name] || null, cell: base(i.cell) }))
+    .sort((a, b) => cellBase === 'ALU4' ? (num(a.sch) - num(b.sch)) || (ord[a.cell] - ord[b.cell]) : a.sch.localeCompare(b.sch));
+}
+
+// ---------- SVG building ----------
+const LAYCLS = { 'N-Well': 'nwell', 'P-Well': 'pwell', 'N-Select': 'sel_', 'P-Select': 'sel_', 'N-Active': 'act', 'P-Active': 'act', 'P-Active-Well': 'act',
+  'Polysilicon-1': 'poly', 'Transistor-Poly': 'poly', 'Active-Cut': 'cut', 'Poly-Cut': 'cut', 'Metal-1': 'm1', 'Via1': 'via', 'Metal-2': 'm2' };
+const LAYORD = { nwell: 0, pwell: 0, sel_: 1, act: 2, poly: 3, cut: 4, m1: 5, via: 6, m2: 7 };
+
+// inline paint for shapes inside <defs>: stylesheet selectors don't reach <use> clones
+const PAINT = {
+  w: 'fill="none" stroke="#4f7dff" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linecap="round"',
+  n: 'fill="none" stroke="#ff5b52" stroke-width="1.4" vector-effect="non-scaling-stroke"',
+  g: 'fill="none" stroke="#e8e3d8" stroke-width="1.4" vector-effect="non-scaling-stroke"',
+  dot: 'fill="#4f7dff"',
+  nwell: 'fill="#6b5d2a" fill-opacity=".22"', pwell: 'fill="#2f5d3a" fill-opacity=".22"',
+  act: 'fill="#6be260" fill-opacity=".82"', poly: 'fill="#ff7faa" fill-opacity=".85"',
+  cut: 'fill="#1c1c1c" stroke="#a7a7a7" stroke-width=".6" vector-effect="non-scaling-stroke"',
+  m1: 'fill="#60d1ff" fill-opacity=".72"', via: 'fill="#d8d8d8" fill-opacity=".9"', m2: 'fill="#e35fff" fill-opacity=".62"',
+  txt: 'fill="#e8e3d8" font-family="IBM Plex Sans, system-ui, sans-serif"',
+  exp: 'fill="#ff8a84" font-family="IBM Plex Sans, system-ui, sans-serif"',
+  arcname: 'fill="#8fb0ff" font-family="IBM Plex Sans, system-ui, sans-serif"',
+};
+const paint = (cls, interactive) => interactive ? '' : ' ' + PAINT[cls];
+function pts(p) { const o = []; for (let i = 0; i < p.length; i += 2) o.push(f(p[i]) + ',' + f(p[i + 1])); return o.join(' '); }
+function dataAttrs(s) { return (s.n ? ` data-net="${esc(s.n)}"` : '') + (s.d ? ` data-dev="${esc(s.d)}"` : ''); }
+
+function layShape(s, interactive) {
+  const cls = LAYCLS[s.l]; if (!cls || cls === 'sel_') return '';
+  return `<polygon class="shp ${cls}" points="${pts(s.p)}"${interactive ? dataAttrs(s) : paint(cls, false)}/>`;
+}
+function arcPoints(p) {
+  // CIRCLEARC: centre, start, end; Electric draws it clockwise from start to end (y up)
+  const [cx, cy, x1, y1, x2, y2] = p; const r = Math.hypot(x1 - cx, y1 - cy);
+  const a1 = Math.atan2(y1 - cy, x1 - cx), a2 = Math.atan2(y2 - cy, x2 - cx);
+  let d = (a1 - a2) % (2 * Math.PI); if (d <= 0) d += 2 * Math.PI;
+  const n = 24, o = [];
+  for (let i = 0; i <= n; i++) { const a = a1 - d * i / n; o.push(f(cx + r * Math.cos(a)) + ',' + f(cy + r * Math.sin(a))); }
+  return o.join(' ');
+}
+function schShape(s, interactive) {
+  const cls = s.l === 'Arc' ? 'w' : s.l === 'Graphics' ? 'g' : 'n';
+  const da = interactive ? dataAttrs(s) : paint(s.s === 'DISC' ? 'dot' : cls, false);
+  const p = s.p; let el = '', hitEl = '';
+  switch (s.s) {
+    case 'OPENED': case 'OPENEDT1': case 'OPENEDT2': case 'OPENEDT3':
+      el = `<polyline class="shp ${cls}" points="${pts(p)}"${da}/>`; hitEl = `<polyline class="hit" points="${pts(p)}"${da}/>`; break;
+    case 'CLOSED': case 'FILLED':
+      el = `<polygon class="shp ${cls}" points="${pts(p)}"${da}/>`; hitEl = `<polygon class="hit" points="${pts(p)}"${da}/>`; break;
+    case 'VECTORS': {
+      let d = ''; for (let i = 0; i + 3 < p.length; i += 4) d += `M${f(p[i])},${f(p[i + 1])}L${f(p[i + 2])},${f(p[i + 3])}`;
+      el = `<path class="shp ${cls}" d="${d}"${da}/>`; hitEl = `<path class="hit" d="${d}"${da}/>`; break; }
+    case 'CIRCLE': case 'THICKCIRCLE': {
+      const r = Math.hypot(p[2] - p[0], p[3] - p[1]);
+      el = `<circle class="shp ${cls}" cx="${f(p[0])}" cy="${f(p[1])}" r="${f(r)}"${da}/>`; break; }
+    case 'DISC': {
+      const r = Math.max(Math.hypot(p[2] - p[0], p[3] - p[1]), 0.35);
+      el = `<circle class="shp dot" cx="${f(p[0])}" cy="${f(p[1])}" r="${f(r)}"${da}/>`; break; }
+    case 'CIRCLEARC': case 'THICKCIRCLEARC':
+      el = `<polyline class="shp ${cls}" points="${arcPoints(p)}"${da}/>`; break;
+    default: return '';
+  }
+  return el + (interactive ? hitEl : '');
+}
+function text(x, y, t, sz, cls, anchor, extra, paintKey) {
+  return `<text class="${cls || ''}"${cls === null ? ' ' + PAINT[paintKey || 'txt'] : ''} transform="translate(${f(x)},${f(y)}) scale(1,-1)" font-size="${f(sz)}" text-anchor="${anchor || 'middle'}" dominant-baseline="central"${extra || ''}>${esc(t)}</text>`;
+}
+
+// icon symbol for schematic instances
+function iconGroup(key) {
+  const c = C[key]; if (!c) return '';
+  const b = c.bounds, cx = b[0] + b[2] / 2;
+  let g = c.shapes.map(s => schShape(s, false)).join('');
+  for (const t of c.texts) g += text(t.x, t.y, t.t, t.sz * 1.1, null, 'middle');
+  for (const e of c.exports) {
+    const inside = e.x < cx ? 1 : -1;
+    g += text(e.x + inside * 1.2, e.y, e.name, Math.max(e.sz, 1) * 0.9, null, inside > 0 ? 'start' : 'end');
+  }
+  return `<g id="ic-${esc(base(key))}">${g}</g>`;
+}
+// full layout cell (non-interactive), referencing sub-cells by <use>
+function layGroup(key) {
+  const c = C[key];
+  const sh = c.shapes.map(s => ({ s, o: LAYORD[LAYCLS[s.l]] ?? 9 })).sort((a, b) => a.o - b.o).map(x => layShape(x.s, false)).join('');
+  const us = c.insts.map(i => `<use href="#lay-${esc(base(i.cell))}" transform="matrix(${i.m.join(',')})"/>`).join('');
+  return `<g id="lay-${esc(base(key))}">${us}${sh}</g>`;
+}
+
+function schGroup(cellBase) {
+  const c = C[cellBase + '{sch}'];
+  let g = c.insts.map(i => `<use href="#ic-${esc(base(i.cell))}" transform="matrix(${i.m.join(',')})"/>`).join('');
+  g += c.shapes.map(sh => schShape(sh, false)).join('');
+  for (const t of c.texts) g += text(t.x, t.y, t.t, t.sz, null, 'middle', '', t.arc ? 'arcname' : 'txt');
+  for (const e of c.exports) {
+    const right = e.dir === 'output';
+    g += text(e.x + (right ? 2.2 : -2.2), e.y, e.name, Math.max(e.sz, 1.2), null, right ? 'start' : 'end', '', 'exp');
+  }
+  return `<g id="sch-${esc(cellBase)}">${g}</g>`;
+}
+function defsFor(kind) {
+  const names = ['NOT', 'NAND', 'XOR', 'FA', 'TRI', 'ALU4'];
+  if (kind === 'sch') return names.map(n => iconGroup(n + '{ic}')).join('') + names.filter(n => n !== 'ALU4').map(schGroup).join('');
+  return names.map(n => layGroup(n + '{lay}')).join('');
+}
+
+function cellSvg(kind, cellBase) {
+  const key = cellBase + (kind === 'sch' ? '{sch}' : '{lay}');
+  const c = C[key];
+  let insts = '', hits = '';
+  for (const i of c.insts) {
+    const ib = base(i.cell);
+    const self = kind === 'sch' && isSelfIcon(cellBase, i);
+    const ref = kind === 'sch' ? `#ic-${esc(ib)}` : `#lay-${esc(ib)}`;
+    insts += `<g class="inst${self ? ' selficon' : ''}" data-inst="${esc(i.name)}"><use href="${ref}" transform="matrix(${i.m.join(',')})"/></g>`;
+    if (!self) {
+      const [x, y, w, h] = i.b;
+      hits += `<rect class="ihit" data-inst="${esc(i.name)}" x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}"/>`;
+    }
+  }
+  let shapes;
+  if (kind === 'lay') {
+    shapes = c.shapes.map(s => ({ s, o: LAYORD[LAYCLS[s.l]] ?? 9 })).sort((a, b) => a.o - b.o).map(x => layShape(x.s, true)).join('');
+  } else {
+    shapes = c.shapes.map(s => schShape(s, true)).join('');
+  }
+  let labels = '';
+  if (kind === 'sch') {
+    for (const t of c.texts) labels += text(t.x, t.y, t.t, t.sz, t.arc ? 'shp arcname' : '', 'middle', t.n ? ` data-net="${esc(t.n)}"` : '');
+    for (const e of c.exports) {
+      const right = e.dir === 'output';
+      labels += text(e.x + (right ? 2.2 : -2.2), e.y, e.name, Math.max(e.sz, 1.2), 'shp exp', right ? 'start' : 'end', ` data-net="${esc(e.n)}"`);
+    }
+  } else {
+    const bw = c.bounds[2];
+    const sz = Math.max(3, Math.min(9, bw / 60));
+    for (const e of c.exports) labels += text(e.x, e.y + sz * 0.9, e.name, sz, 'shp', 'middle', ` data-net="${esc(e.n)}"`);
+  }
+  return `<g transform="scale(1,-1)">${insts}${hits}<g class="own">${shapes}</g>${labels}</g>`;
+}
+
+// ---------- in-place expansion of schematic icons ----------
+const expanded = new Set();
+function expansionSvg(cellBase, instName) {
+  const inst = C[cellBase + '{sch}'].insts.find(i => i.name === instName);
+  if (!inst) return '';
+  const sub = base(inst.cell), ib = C[sub + '{sch}'].bounds, [bx, by, bw, bh] = inst.b;
+  const sc = Math.min(bh * 2.8 / ib[3], bw * 5 / ib[2]);
+  const W = ib[2] * sc, H = ib[3] * sc, cx = bx + bw / 2, cy = by + bh / 2;
+  const icx = ib[0] + ib[2] / 2, icy = ib[1] + ib[3] / 2, pad = H * 0.08, cap = Math.max(H * 0.075, 1.2);
+  return `<g class="xgrp" data-inst="${esc(instName)}">` +
+    `<rect class="xbg" data-inst="${esc(instName)}" x="${f(cx - W / 2 - pad)}" y="${f(cy - H / 2 - pad)}" width="${f(W + 2 * pad)}" height="${f(H + 2 * pad + cap * 1.6)}"/>` +
+    `<use href="#sch-${esc(sub)}" transform="translate(${f(cx)},${f(cy)}) scale(${sc}) translate(${f(-icx)},${f(-icy)})" style="pointer-events:none"/>` +
+    text(cx - W / 2, cy + H / 2 + cap * 0.9, `${instName} · ${sub} · click inside to open ▸ · Esc to close`, cap, null, 'start', '', 'txt') +
+    `</g>`;
+}
+function renderExpansions() {
+  const root = panes.sch.content.firstElementChild;
+  root.querySelectorAll('.xgrp').forEach(g => g.remove());
+  for (const n of expanded) root.insertAdjacentHTML('beforeend', expansionSvg(cur(), n));
+}
+
+// ---------- pan / zoom panes ----------
+class Pane {
+  constructor(kind) {
+    this.kind = kind;
+    this.svg = document.getElementById(kind + 'Svg');
+    this.tip = document.getElementById(kind + 'Tip');
+    this.svg.innerHTML = `<defs>${defsFor(kind)}</defs><g class="content"></g>`;
+    this.content = this.svg.querySelector('.content');
+    this.vb = { x: 0, y: 0, w: 100, h: 100 };
+    this.bind();
+  }
+  show(cellBase) {
+    this.cell = cellBase;
+    this.content.innerHTML = cellSvg(this.kind, cellBase);
+    this.fit();
+  }
+  fit() {
+    const b = C[this.cell + (this.kind === 'sch' ? '{sch}' : '{lay}')].bounds;
+    const pad = Math.max(b[2], b[3]) * 0.04 + 4;
+    // flipped: screen y = -Y
+    this.vb = { x: b[0] - pad, y: -(b[1] + b[3]) - pad, w: b[2] + 2 * pad, h: b[3] + 2 * pad };
+    this.apply();
+  }
+  zoomTo(els) {
+    // union of the elements' boxes in drawing coordinates (y up), shown with y flipped
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const el of els) {
+      const b = el.getBBox();
+      x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+    }
+    if (!isFinite(x0)) return;
+    const w = Math.max(x1 - x0, 4), h = Math.max(y1 - y0, 4), pad = Math.max(w, h) * 0.25 + 3;
+    this.vb = { x: x0 - pad, y: -(y0 + h) - pad, w: w + 2 * pad, h: h + 2 * pad }; this.apply();
+  }
+  apply() { const v = this.vb; this.svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`); }
+  toSvg(cx, cy) { const pt = this.svg.createSVGPoint(); pt.x = cx; pt.y = cy; return pt.matrixTransform(this.svg.getScreenCTM().inverse()); }
+  zoom(factor, cx, cy) {
+    const p = this.toSvg(cx, cy), v = this.vb;
+    v.x = p.x - (p.x - v.x) * factor; v.y = p.y - (p.y - v.y) * factor; v.w *= factor; v.h *= factor; this.apply();
+  }
+  bind() {
+    const s = this.svg; let down = null, moved = false, pointers = new Map(), pinch = null;
+    s.addEventListener('wheel', e => { e.preventDefault(); this.zoom(Math.exp(e.deltaY * 0.0015), e.clientX, e.clientY); }, { passive: false });
+    s.addEventListener('pointerdown', e => {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
+      down = { x: e.clientX, y: e.clientY, vb: { ...this.vb }, p: this.toSvg(e.clientX, e.clientY) }; moved = false;
+      s.setPointerCapture(e.pointerId);
+    });
+    s.addEventListener('pointermove', e => {
+      if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 2 && pinch) {
+        const [a, b] = [...pointers.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y);
+        this.zoom(pinch / d, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; moved = true; return;
+      }
+      if (down) {
+        if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > 4) moved = true;
+        if (moved) {
+          s.classList.add('drag');
+          const ctm = s.getScreenCTM(); const k = 1 / ctm.a;
+          this.vb.x = down.vb.x - (e.clientX - down.x) * k; this.vb.y = down.vb.y - (e.clientY - down.y) * k; this.apply();
+        }
+        return;
+      }
+      this.hover(e);
+    });
+    const end = e => {
+      pointers.delete(e.pointerId); if (pointers.size < 2) pinch = null;
+      s.classList.remove('drag');
+      if (down && !moved && e.type === 'pointerup') onClick(this, e);
+      down = null;
+    };
+    s.addEventListener('pointerup', end); s.addEventListener('pointercancel', end);
+    s.addEventListener('pointerleave', () => { this.tip.hidden = true; });
+  }
+  hover(e) {
+    const t = e.target.closest('[data-net],[data-dev],[data-inst]');
+    if (!t) { this.tip.hidden = true; return; }
+    let label;
+    if (t.dataset.inst) { const i = C[this.cell + (this.kind === 'sch' ? '{sch}' : '{lay}')].insts.find(x => x.name === t.dataset.inst); label = `${t.dataset.inst} · ${base(i.cell)} · click to expand, click again to open`; }
+    else if (t.dataset.dev) label = `transistor ${t.dataset.dev}`;
+    else label = `net ${netLabel(t.dataset.net)}`;
+    const r = this.svg.getBoundingClientRect();
+    this.tip.textContent = label; this.tip.style.left = (e.clientX - r.left) + 'px'; this.tip.style.top = (e.clientY - r.top) + 'px'; this.tip.hidden = false;
+  }
+}
+
+// ---------- state, selection, navigation ----------
+const panes = { sch: new Pane('sch'), lay: new Pane('lay') };
+let path = [{ cell: 'ALU4', sch: null, lay: null }];
+let sel = null;
+const cur = () => path[path.length - 1].cell;
+
+function counterpart(kind, type, name) {
+  const e = kind === 'sch' ? EQ[cur()] : EQR[cur()];
+  return (type === 'net' ? e.nets : e.nodes)[name] || null;
+}
+function onClick(pane, e) {
+  // pointer capture retargets the event to the <svg>, so find what is actually under the pointer
+  const hit = document.elementFromPoint(e.clientX, e.clientY);
+  const t = hit && pane.svg.contains(hit) ? hit.closest('[data-net],[data-dev],[data-inst]') : null;
+  if (!t || t.closest('.selficon')) { collapseAll(); select(null); return; }
+  let type, name;
+  if (t.dataset.inst) { type = 'inst'; name = t.dataset.inst; }
+  else if (t.dataset.dev) { type = 'dev'; name = t.dataset.dev; }
+  else { type = 'net'; name = t.dataset.net; }
+  const other = counterpart(pane.kind, type, name);
+  const s = { type, sch: pane.kind === 'sch' ? name : other, lay: pane.kind === 'lay' ? name : other };
+  if (type === 'inst') return toggleBlock(s);
+  if (sel && sel.type === s.type && sel.sch === s.sch && sel.lay === s.lay) select(null); else select(s);
+}
+function toggleBlock(s) {
+  // first click expands the block in place; clicking it again goes inside
+  const already = sel && sel.type === 'inst' && sel.sch === s.sch && sel.lay === s.lay;
+  if (already || (s.sch && expanded.has(s.sch))) {
+    if (s.sch) openInst('sch', s.sch); else if (s.lay) openInst('lay', s.lay);
+    return;
+  }
+  expanded.clear();
+  if (s.sch) expanded.add(s.sch);
+  renderExpansions();
+  select(s);
+  zoomSel();
+}
+function collapseAll() { if (expanded.size) { expanded.clear(); renderExpansions(); } }
+function mark(pane, type, name) {
+  const attr = type === 'inst' ? 'data-inst' : type === 'dev' ? 'data-dev' : 'data-net';
+  pane.content.querySelectorAll(`[${attr}="${cssq(name)}"]`).forEach(el => {
+    el.classList.add('hl');
+    const g = el.closest('.inst'); if (g) g.classList.add('hl');
+  });
+}
+function select(s) {
+  sel = s;
+  for (const k of ['sch', 'lay']) {
+    const p = panes[k];
+    p.content.querySelectorAll('.hl').forEach(el => el.classList.remove('hl'));
+    p.svg.classList.toggle('has-sel', !!s);
+    if (s && s[k]) mark(p, s.type, s[k]);
+  }
+  renderSel();
+}
+
+function zoomSel() {
+  if (!sel) return;
+  for (const k of ['sch', 'lay']) {
+    const p = panes[k];
+    let els;
+    if (sel.type === 'inst') {
+      const x = k === 'sch' && sel.sch ? p.content.querySelector(`.xgrp[data-inst="${cssq(sel.sch)}"] .xbg`) : null;
+      els = x ? [x] : [...p.content.querySelectorAll('.ihit.hl')];
+    } else {
+      els = [...p.content.querySelectorAll('.hl')].filter(el => !el.classList.contains('inst') && el.tagName !== 'text' && !el.closest('.xgrp'));
+    }
+    if (els.length) p.zoomTo(els);
+  }
+}
+function openInst(kind, name) {
+  const cellKey = cur() + (kind === 'sch' ? '{sch}' : '{lay}');
+  const inst = C[cellKey].insts.find(i => i.name === name);
+  if (!inst || (kind === 'sch' && isSelfIcon(cur(), inst))) return;
+  const schName = kind === 'sch' ? name : EQR[cur()].nodes[name];
+  const layName = kind === 'lay' ? name : EQ[cur()].nodes[name];
+  path.push({ cell: base(inst.cell), sch: schName, lay: layName });
+  go();
+}
+function up() { if (path.length > 1) { path.pop(); go(); } }
+function goTo(p) { path = p; go(); }
+
+function friendly(parent, schName, cell) {
+  const m = /@(\d+)$/.exec(schName || '');
+  if (parent === 'ALU4' && m) return `bit ${m[1]} · ${cell === 'FA' ? 'full adder' : cell === 'TRI' ? 'tri-state' : 'A xor Sub'}`;
+  return schName;
+}
+
+function go() {
+  const cell = cur();
+  expanded.clear();
+  panes.sch.show(cell); panes.lay.show(cell);
+  sel = null; select(null);
+  const fr = path[path.length - 1];
+  document.getElementById('schName').textContent = `${cell}{sch}` + (fr.sch ? ` · instance ${fr.sch}` : '');
+  document.getElementById('layName').textContent = `${cell}{lay}` + (fr.lay ? ` · instance ${fr.lay}` : '');
+  // breadcrumbs
+  const cr = document.getElementById('crumbs'); cr.innerHTML = '';
+  path.forEach((fr2, i) => {
+    if (i) { const s = document.createElement('span'); s.className = 'sep'; s.textContent = '›'; cr.append(s); }
+    const b = document.createElement('button'); b.type = 'button';
+    b.textContent = i === 0 ? fr2.cell : `${friendly(path[i - 1].cell, fr2.sch, fr2.cell)} (${fr2.cell})`;
+    if (i === path.length - 1) b.setAttribute('aria-current', 'page');
+    b.addEventListener('click', () => goTo(path.slice(0, i + 1)));
+    cr.append(b);
+  });
+  document.getElementById('up').disabled = path.length === 1;
+  renderTree();
+  renderPalette();
+}
+
+function renderSel() {
+  for (const k of ['sch', 'lay']) {
+    const chip = document.getElementById(k + 'Sel');
+    if (!sel || !sel[k]) { chip.hidden = true; continue; }
+    const kind = sel.type === 'net' ? 'net' : sel.type === 'dev' ? (deviceType(k, sel[k]) || 'transistor') : 'block';
+    chip.textContent = `${kind} ${sel.type === 'net' ? netLabel(sel[k]) : sel[k]}`;
+    chip.title = (sel.sch && sel.lay) ? 'Matched schematic ↔ layout by LVS (NCC)' : `Only in the ${k === 'sch' ? 'schematic' : 'layout'}`;
+    chip.hidden = false;
+  }
+  document.querySelectorAll('[data-zoom]').forEach(b => { b.disabled = !sel; });
+}
+function deviceType(k, name) {
+  const d = C[cur() + (k === 'sch' ? '{sch}' : '{lay}')].devs.find(x => x.name === name);
+  return d ? (d.p ? 'PMOS' : 'NMOS') : null;
+}
+function renderPalette() {
+  const items = [['ALU4', '4-bit ALU'], ['FA', 'full adder'], ['XOR', 'xor'], ['NAND', 'nand'], ['NOT', 'inverter'], ['TRI', 'tri-state']];
+  const pal = document.getElementById('palette');
+  pal.innerHTML = items.map(([n, d]) => {
+    const b = C[n + '{ic}'].bounds, pad = Math.max(b[2], b[3]) * 0.12 + 1;
+    return `<button class="comp" type="button" data-cell="${n}"${path.length === 1 && path[0].cell === n ? ' aria-current="true"' : ''}>` +
+      `<svg viewBox="${f(b[0] - pad)} ${f(-(b[1] + b[3]) - pad)} ${f(b[2] + 2 * pad)} ${f(b[3] + 2 * pad)}" aria-hidden="true"><g transform="scale(1,-1)"><use href="#ic-${n}"/></g></svg>` +
+      `<span>${n}</span><small>${d}</small></button>`;
+  }).join('');
+  pal.querySelectorAll('.comp').forEach(b => b.addEventListener('click', () => goTo([{ cell: b.dataset.cell, sch: null, lay: null }])));
+}
+function renderTree() {
+  const curKey = path[0].cell === 'ALU4' ? path.map(p => p.sch || 'root').join('/') : 'standalone';
+  function node(cell, p, label) {
+    const key = p.map(x => x.sch || 'root').join('/');
+    const kids = childInsts(cell);
+    let h = `<li><button type="button" data-path="${esc(JSON.stringify(p))}"${key === curKey ? ' aria-current="true"' : ''}>${esc(label)} <span class="cellname">${cell}</span></button>`;
+    // expand the root and every node on the current path
+    const open = p.length === 1 || curKey === key || curKey.startsWith(key + '/');
+    if (kids.length && open) h += '<ul>' + kids.map(k => node(k.cell, [...p, { cell: k.cell, sch: k.sch, lay: k.lay }], friendly(cell, k.sch, k.cell))).join('') + '</ul>';
+    return h + '</li>';
+  }
+  const t = document.getElementById('tree');
+  t.innerHTML = '<ul>' + node('ALU4', [{ cell: 'ALU4', sch: null, lay: null }], 'ALU4') + '</ul>';
+  t.querySelectorAll('button[data-path]').forEach(b => b.addEventListener('click', () => goTo(JSON.parse(b.dataset.path))));
+}
+
+document.getElementById('up').addEventListener('click', up);
+document.querySelectorAll('[data-zoom]').forEach(b => b.addEventListener('click', zoomSel));
+document.querySelectorAll('[data-fit]').forEach(b => b.addEventListener('click', () => panes[b.dataset.fit].fit()));
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea')) return;
+  if (e.key === 'Escape' || e.key === 'Backspace') { if (sel || expanded.size) { collapseAll(); select(null); panes.sch.fit(); panes.lay.fit(); } else up(); e.preventDefault(); }
+  if (e.key === 'f' || e.key === 'F') { panes.sch.fit(); panes.lay.fit(); }
+  if ((e.key === 'z' || e.key === 'Z') && sel) zoomSel();
+  if (e.key === 'Enter' && sel && sel.type === 'inst') openInst('sch', sel.sch);
+});
+window.addEventListener('resize', () => { panes.sch.apply(); panes.lay.apply(); });
+go();
+</script>

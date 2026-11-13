@@ -240,3 +240,4 @@ The layout is about 2× slower because of the extra diffusion capacitance. That 
 | `sim/*.plt` | LTspice plot settings for each deck |
 | `scripts/` | Library generator, LTspice `.raw` reader, exhaustive checker, settle-time measurement, `.plt` generator |
 | `images/` | Figures |
+| `viewer/index.html` | Interactive design explorer: click through the hierarchy, schematic and layout side by side, cross-probed by NCC (open in a browser) |
