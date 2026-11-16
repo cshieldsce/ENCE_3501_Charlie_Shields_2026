@@ -1,9 +1,27 @@
 """Build the ALU4 design explorer page from Electric's dump (design.json).
 
 Usage: python3 build.py design.json template.html out_artifact.html out_local.html
+       python3 build.py --reuse index.html template.html out_artifact.html out_local.html
+         (re-skin only: reuses the data already embedded in a built page, no Electric dump needed)
 """
 import json
 import sys
+
+
+def write(payload, tpl, out_art, out_local):
+    html = open(tpl, encoding='utf-8').read().replace('/*__DATA__*/null', payload)
+    open(out_art, 'w', encoding='utf-8').write(html)
+    open(out_local, 'w', encoding='utf-8').write('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n</head>\n<body>\n' + html + '\n</body>\n</html>\n')
+    print('wrote', out_art, len(html) // 1024, 'KB')
+
+
+if sys.argv[1] == '--reuse':
+    built, tpl, out_art, out_local = sys.argv[2:6]
+    page = open(built, encoding='utf-8').read()
+    start = page.index('const DATA = ') + len('const DATA = ')
+    data, end = json.JSONDecoder().raw_decode(page[start:])
+    write(page[start:start + end], tpl, out_art, out_local)
+    sys.exit()
 
 src, tpl, out_art, out_local = sys.argv[1:5]
 d = json.load(open(src))
@@ -68,8 +86,4 @@ for k, c in cells.items():
         'devs': [{'name': x['name'], 'p': x['p']} for x in c.get('devs', [])],
     }
 
-payload = json.dumps({'cells': slim, 'equiv': equiv}, separators=(',', ':'))
-html = open(tpl).read().replace('/*__DATA__*/null', payload)
-open(out_art, 'w').write(html)
-open(out_local, 'w').write('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n</head>\n<body>\n' + html + '\n</body>\n</html>\n')
-print('wrote', out_art, len(html) // 1024, 'KB')
+write(json.dumps({'cells': slim, 'equiv': equiv}, separators=(',', ':')), tpl, out_art, out_local)
