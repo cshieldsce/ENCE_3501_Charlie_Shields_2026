@@ -1490,10 +1490,15 @@ function renderSimMath() {
   const row = (l, b, n) => `<span class="ml">${l}</span><span class="mb">${b}</span><span class="mn">${n}</span>`;
   const sub = sim.Sub === 1;
   const h = '<div class="math">' +
-    row('B', word(k => 'B' + k), `= ${sim.B}`) +
-    row('A', word(k => 'A' + k), `= ${sim.A}`) +
-    (sub ? row('A flipped', word(xo), 'the 4 XORs flip A because Sub = 1') : row('A into adder', word(xo), 'Sub = 0, the XORs pass A through')) +
-    row('+ carry-in', bit(cin), sub ? 'Sub = 1 also feeds bit 0: the “+1”' : 'Sub = 0, nothing extra') +
+    // subtract reads as B + ~A + 1: A is shown already through the XORs, and the carry-in is the +1
+    (sub
+      ? row('B', word(k => 'B' + k), `= ${sim.B}`) +
+        row('+ A flipped', word(xo), `= ${~sim.A & 15}  (A = ${sim.A}, flipped by the XORs)`) +
+        row('+ 1', bit(cin), 'Sub = 1 is also the carry-in to bit 0')
+      : row('B', word(k => 'B' + k), `= ${sim.B}`) +
+        row('A', word(k => 'A' + k), `= ${sim.A}`) +
+        row('A into adder', word(xo), 'Sub = 0, the XORs pass A through') +
+        row('+ carry-in', bit(cin), 'Sub = 0, nothing extra')) +
     '<span class="rule"></span>' +
     row('result', `<i class="co">${VSHOW(v('Cout'))}</i> ${word(Sn)}`, 'Cout, then S3 S2 S1 S0') +
     '</div>';
