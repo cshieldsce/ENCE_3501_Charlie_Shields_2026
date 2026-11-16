@@ -124,7 +124,7 @@ main { display: grid; grid-template-rows: 1fr 6px 1fr; min-height: 0; min-width:
 
 /* schematic drawing */
 .sch .w { fill: none; stroke: #4f7dff; stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
-.sch .n { fill: none; stroke: #ff5b52; stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.sch .n { fill: none; stroke: var(--ncol, #ff5b52); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .sch .g { fill: none; stroke: #e8e3d8; stroke-width: 1.4px; vector-effect: non-scaling-stroke; }
 .sch .dot { fill: #4f7dff; stroke: none; }
 .sch text { fill: #e8e3d8; font-family: var(--sans); }
@@ -158,32 +158,35 @@ main { display: grid; grid-template-rows: 1fr 6px 1fr; min-height: 0; min-width:
 .has-sel.lay .shp:not(.hl) { opacity: .4; }
 
 /* ---------- logic simulator page ---------- */
-:root { --v1: #ff9a3c; --v0: #6b7280; --vz: #b48cff; --vx: #ff5b52; --vn: #343b47; }
+/* 1 is light, 0 is dark; orange is kept for what changed in the step on screen, so the eye goes to the action */
+:root { --v1: #e4e8ee; --v0: #4b5361; --hot: #ff9a3c; --vz: #b48cff; --vx: #ff5b52; --vn: #2c323c; }
 .app[hidden] { display: none; }
-.simsch .shp.w[data-v], .simsch .shp.n[data-v] { stroke-width: 1.6px; }
-.simsch .shp.w[data-v="1"], .simsch .shp.n[data-v="1"] { stroke: var(--v1); stroke-width: 2.8px; }
+.simsch { --ncol: #c4cad4; }   /* symbol outlines (XOR body) go neutral: orange means "just changed" here */
+.simsch .shp.w[data-v], .simsch .shp.n[data-v] { stroke-width: 1.4px; }
+.simsch .shp.w[data-v="1"], .simsch .shp.n[data-v="1"] { stroke: var(--v1); stroke-width: 2.2px; }
 .simsch .shp.w[data-v="0"], .simsch .shp.n[data-v="0"] { stroke: var(--v0); }
 .simsch .shp.w[data-v="z"], .simsch .shp.n[data-v="z"] { stroke: var(--vz); stroke-dasharray: 5 4; }
 .simsch .shp.w[data-v="x"], .simsch .shp.n[data-v="x"] { stroke: var(--vx); }
 .simsch .shp.w:not([data-v]), .simsch .shp.n:not([data-v]) { stroke: var(--vn); stroke-dasharray: 2 3; }
 .simsch .dot[data-v="1"] { fill: var(--v1); } .simsch .dot[data-v="0"] { fill: var(--v0); }
 .simsch .dot[data-v="z"] { fill: var(--vz); } .simsch .dot:not([data-v]) { fill: var(--vn); }
-.simsch text[data-v="1"] { fill: var(--v1); font-weight: 600; } .simsch text[data-v="0"] { fill: #a3abb8; }
+.simsch text[data-v="1"] { fill: var(--v1); font-weight: 600; } .simsch text[data-v="0"] { fill: #8d96a6; }
 .simsch text[data-v="z"] { fill: var(--vz); } .simsch text[data-v="x"] { fill: var(--vx); }
-.simsch .shp.chg:not(text) { stroke-width: 5px !important; }
-.simlay .shp[data-v="1"] { fill: var(--v1); fill-opacity: .9; }
-.simlay .shp[data-v="0"] { fill-opacity: .18; }
+.simsch .shp.chg:not(text) { stroke: var(--hot) !important; stroke-width: 4.5px !important; }
+.simsch .dot.chg { fill: var(--hot) !important; }
+.simlay .shp[data-v="0"] { fill-opacity: .12; }
 .simlay .shp[data-v="z"] { fill: var(--vz); fill-opacity: .85; }
 .simlay .shp[data-v="x"] { fill: var(--vx); fill-opacity: .85; }
-.simlay .shp.chg { stroke: #ffffff; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
-.simlay text.shp[data-v] { fill-opacity: 1; fill: #c4cad4; }
+.simlay .shp.chg { fill: var(--hot); fill-opacity: .95; stroke: #ffffff; stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
+.simlay text.shp[data-v] { fill-opacity: 1; fill: #8d96a6; }
 .simlay text.shp[data-v="1"] { fill: var(--v1); }
 .simlay text.shp[data-v="z"] { fill: var(--vz); }
+.simlay text.shp.chg { fill: var(--hot); stroke: #000; }
 .result { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: #151a21; display: flex; flex-direction: column; gap: 6px; }
 .result .eq { font-family: var(--mono); font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
-.result .eq b { color: var(--v1); }
+.result .eq b { color: var(--hot); }
 .result .eq.off b { color: var(--vz); }
-.result .line { min-height: 3em; font-size: 13px; color: #b8c0cc; line-height: 1.5; }
+.result .line { min-height: 1.5em; font-size: 13px; color: #b8c0cc; line-height: 1.5; }
 .result .line code { font-family: var(--mono); background: #232a35; padding: 1px 5px; border-radius: 3px; }
 .result .status { font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
 .result .good { color: var(--ok); font-weight: 600; } .result .bad { color: var(--vx); font-weight: 600; }
@@ -212,7 +215,7 @@ table.vals td.v1 { color: var(--v1); font-weight: 600; } table.vals td.v0 { colo
 table.vals td.vz { color: var(--vz); } table.vals td.vx { color: var(--vx); }
 table.vals th:first-child, table.vals td:first-child { color: var(--muted); }
 .simsch text.pv { font-family: var(--mono); font-weight: 700; paint-order: stroke; stroke: #000; stroke-width: 3px; vector-effect: non-scaling-stroke; }
-.simsch text.pv.chg, .simsch text.exp.chg { fill: #ffffff !important; paint-order: stroke; stroke: #b85c00; stroke-width: 3px; vector-effect: non-scaling-stroke; }
+.simsch text.pv.chg, .simsch text.exp.chg { fill: var(--hot) !important; paint-order: stroke; stroke: #000; stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .stepper { display: flex; flex-direction: column; gap: 8px; }
 .stepper h3 { margin-bottom: 0; }
 .transport { display: flex; align-items: center; gap: 5px; }
@@ -227,8 +230,26 @@ table.vals th:first-child, table.vals td:first-child { color: var(--muted); }
 .changes .ch { display: flex; justify-content: space-between; gap: 8px; }
 .changes .ch b { font-family: var(--mono); white-space: nowrap; font-weight: 500; color: var(--muted); }
 .changes i { font-style: normal; font-weight: 700; }
-.changes i.v1 { color: var(--v1); } .changes i.v0 { color: #a3abb8; } .changes i.vz { color: var(--vz); } .changes i.vx { color: var(--vx); }
-.toggle.auto { align-self: stretch; white-space: normal; }
+.changes i.v1 { color: var(--v1); } .changes i.v0 { color: #8d96a6; } .changes i.vz { color: var(--vz); } .changes i.vx { color: var(--vx); }
+.cases { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.case { border: 1px solid var(--line); border-radius: 8px; background: #151a21; padding: 10px 12px; text-align: left; cursor: pointer; color: var(--fg); font: inherit; }
+.case:hover { border-color: #4a5466; }
+.case b { display: block; font-family: var(--mono); font-size: 24px; font-weight: 600; line-height: 1.2; }
+.case small { color: var(--muted); font-size: 12.5px; }
+.case[aria-pressed="true"] { border-color: var(--hot); background: #241a10; }
+.case[aria-pressed="true"] small { color: #e8b98a; }
+.math { display: grid; grid-template-columns: auto auto 1fr; gap: 5px 12px; align-items: baseline; }
+.math .ml { font-size: 13px; color: #b8c0cc; white-space: nowrap; }
+.math .mb { font-family: var(--mono); font-size: 21px; font-weight: 600; text-align: right; letter-spacing: .1em; white-space: pre; font-variant-numeric: tabular-nums; }
+.math .mn { font-size: 12px; color: var(--muted); line-height: 1.3; }
+.math .rule { grid-column: 1 / -1; border-top: 1px solid #4a5466; margin: 1px 0; }
+.math i { font-style: normal; } .math i.chg { color: var(--hot); } .math i.co { color: var(--muted); }
+.read { margin-top: 10px; font-size: 14px; line-height: 1.55; color: #c9cfd8; }
+.read b { color: var(--hot); font-family: var(--mono); font-size: 17px; }
+.read code { font-family: var(--mono); background: #232a35; padding: 1px 5px; border-radius: 3px; }
+.read .sub { display: block; color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+details.more summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 2px 0; }
+details.more[open] summary { margin-bottom: 8px; }
 #simSide { overflow-x: hidden; }
 .vlegend i { width: 14px; height: 4px; border-radius: 2px; vertical-align: 2px; }
 
@@ -302,16 +323,11 @@ table.vals th:first-child, table.vals td:first-child { color: var(--muted); }
   <aside id="simSide">
     <section class="result" id="simResult" aria-live="polite"></section>
     <section>
-      <h3>Inputs</h3>
-      <div id="simInputs"></div>
-    </section>
-    <section>
-      <h3>Try</h3>
-      <div class="presets" id="simPresets"></div>
+      <h3>Pick a case</h3>
+      <div class="cases" id="simPresets"></div>
     </section>
     <section class="stepper">
-      <h3>Step through it, one gate delay at a time</h3>
-      <p class="hint">The ALU has no clock: it's combinational logic. Each step is one gate delay, the time one gate takes to react.</p>
+      <h3>Step through it</h3>
       <div class="transport">
         <button class="btn" type="button" id="tFirst" title="Back to the moment the inputs changed (Home)" aria-label="First step">⏮</button>
         <button class="btn" type="button" id="tPrev" title="Back one gate delay (←)" aria-label="Previous step">◂</button>
@@ -320,28 +336,33 @@ table.vals th:first-child, table.vals td:first-child { color: var(--muted); }
         <button class="btn" type="button" id="tLast" title="Jump to the settled result (End)" aria-label="Last step">⏭</button>
         <span class="tcount" id="tCount"></span>
       </div>
-      <div id="simWave" class="wave"></div>
-      <div id="simChanges" class="changes" aria-live="polite"></div>
-      <label class="toggle auto"><input type="checkbox" id="simAuto" checked> Play by itself when an input changes</label>
-      <div class="seg" id="simSpeed" style="margin:0"></div>
+      <p class="hint">No clock here: each step is one gate delay. Wires that just changed are <span style="color:var(--hot);font-weight:600">orange</span>.</p>
     </section>
     <section>
-      <h3>Bit by bit</h3>
-      <div id="simBits"></div>
+      <h3>The math, read off the circuit</h3>
+      <div id="simMath"></div>
     </section>
+    <section>
+      <h3>What just changed</h3>
+      <div id="simChanges" class="changes" aria-live="polite"></div>
+    </section>
+    <details class="more">
+      <summary>Other inputs</summary>
+      <div id="simInputs"></div>
+    </details>
   </aside>
 
   <main id="simMain">
     <section class="pane">
       <div class="pane-h"><span class="t">Schematic</span><span class="c" id="simSchName"></span>
-        <div class="legend vlegend" aria-label="Wire colours"><span><i style="background:var(--v1)"></i>1</span><span><i style="background:var(--v0)"></i>0</span><span><i style="background:var(--vz)"></i>Z floating</span><span><i style="background:var(--vn)"></i>not simulated</span></div>
+        <div class="legend vlegend" aria-label="Wire colours"><span><i style="background:var(--v1)"></i>1</span><span><i style="background:var(--v0)"></i>0</span><span><i style="background:var(--hot)"></i>just changed</span><span><i style="background:var(--vz)"></i>Z floating</span></div>
         <div class="tools"><button class="btn" type="button" data-simfit="sch">Fit</button></div></div>
       <div class="stage"><svg id="simSchSvg" class="sch simsch" role="img" aria-label="Simulated schematic"></svg><div class="tip" id="simSchTip" hidden></div></div>
     </section>
     <div class="split" id="simSplit" role="separator" aria-orientation="horizontal" title="Drag to resize · double-click to reset"></div>
     <section class="pane">
       <div class="pane-h"><span class="t">Layout</span><span class="c" id="simLayName"></span>
-        <div class="legend vlegend"><span><i style="background:var(--v1)"></i>net at 1 lights up</span><span>net at 0 dims</span></div>
+        <div class="legend vlegend"><span>net at 1 bright</span><span>net at 0 faded</span><span><i style="background:var(--hot)"></i>just changed</span></div>
         <div class="tools"><button class="btn" type="button" data-simfit="lay">Fit</button></div></div>
       <div class="stage"><svg id="simLaySvg" class="lay simlay" role="img" aria-label="Simulated layout"></svg><div class="tip" id="simLayTip" hidden></div></div>
     </section>
@@ -451,7 +472,7 @@ const LAYORD = { nwell: 0, pwell: 0, sel_: 1, act: 2, poly: 3, cut: 4, m1: 5, vi
 // inline paint for shapes inside <defs>: stylesheet selectors don't reach <use> clones
 const PAINT = {
   w: 'fill="none" stroke="#4f7dff" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linecap="round"',
-  n: 'fill="none" stroke="#ff5b52" stroke-width="1.4" vector-effect="non-scaling-stroke"',
+  n: 'fill="none" style="stroke: var(--ncol, #ff5b52)" stroke-width="1.4" vector-effect="non-scaling-stroke"',
   g: 'fill="none" stroke="#e8e3d8" stroke-width="1.4" vector-effect="non-scaling-stroke"',
   dot: 'fill="#4f7dff"',
   nwell: 'fill="#6b5d2a" fill-opacity=".22"', pwell: 'fill="#2f5d3a" fill-opacity=".22"',
@@ -1209,7 +1230,7 @@ const LEAF_INT = {
 
 // H holds every step of the current change: H[0] is the moment the inputs flip, H[t] after t gate delays, the last
 // entry the settled state. Playback and the step buttons just choose which step is shown.
-const sim = { A: 5, B: 3, Sub: 0, En: 1, V: new Map(), H: [], before: null, at: 0, auto: true, playing: false, speed: 450, timer: 0, changed: false };
+const sim = { A: 2, B: 7, Sub: 1, En: 1, V: new Map(), H: [], before: null, at: 0, auto: true, playing: false, speed: 650, timer: 0, changed: false };
 const lastStep = () => sim.H.length - 1;
 function simBits() {
   const o = { Sub: sim.Sub, En: sim.En };
@@ -1431,6 +1452,7 @@ function renderSimInputs() {
       `<div class="dec"><button class="btn" type="button" data-step="${w},-1" aria-label="${w} minus one">−</button><b>${v}</b><button class="btn" type="button" data-step="${w},1" aria-label="${w} plus one">+</button></div></div>`;
   };
   const seg = (key, opts) => `<div class="seg">${opts.map(([v, l]) => `<button type="button" data-set="${key},${v}" aria-pressed="${sim[key] === v}">${l}</button>`).join('')}</div>`;
+  renderCases();
   document.getElementById('simInputs').innerHTML = word('A') + word('B') +
     `<div class="seglbl">Sub</div>` + seg('Sub', [[0, 'Add · A + B'], [1, 'Subtract · B − A']]) +
     `<div class="seglbl">En (output enable)</div>` + seg('En', [[1, 'On · drive S'], [0, 'Off · S floats (Z)']]);
@@ -1438,34 +1460,64 @@ function renderSimInputs() {
 function renderSimResult() {
   const v = n => netVal('ALU4', '', n);
   const S = [0, 1, 2, 3].map(k => v('S' + k)), cout = v('Cout');
-  const sStr = S.slice().reverse().map(VSHOW).join('');
+  const settled = sim.at === lastStep();
+  const q = sim.Sub ? `${sim.B} − ${sim.A}` : `${sim.A} + ${sim.B}`;
   let eq, line;
   if (S.every(x => x === 'z')) {
     eq = `<div class="eq off">S = <b>ZZZZ</b></div>`;
-    line = `En = 0: the tri-state buffers let go of the S bus, so other parts could drive it. The adder still runs (Cout = <code>${VSHOW(cout)}</code>).`;
-  } else if (S.every(isBit) && isBit(cout)) {
+    line = 'En = 0: the tri-states let go of the S outputs.';
+  } else if (S.every(isBit) && isBit(cout) && settled) {
     const s = S.reduce((a, b, k) => a + (b << k), 0);
     const res = sim.Sub ? s - 16 * (1 - cout) : s + 16 * cout, want = sim.Sub ? sim.B - sim.A : sim.A + sim.B;
-    eq = `<div class="eq">${sim.Sub ? `${sim.B} − ${sim.A}` : `${sim.A} + ${sim.B}`} = <b>${res}</b></div>`;
-    line = `S = <code>${sStr}</code> (${s}) · Cout = <code>${cout}</code> → ` +
-      (sim.Sub ? (cout ? 'no borrow, B ≥ A, answer = S' : 'borrow, B < A, answer = S − 16') : (cout ? 'carry out, answer = S + 16' : 'answer = S')) +
-      (sim.at === lastStep() ? (res === want ? ' <span class="good">✓ correct</span>' : ` <span class="bad">✗ expected ${want}</span>`) : ' <span style="color:var(--muted)">(not settled yet)</span>');
+    eq = `<div class="eq">${q} = <b>${res}</b></div>`;
+    line = res === want ? '<span class="good">✓ correct</span>' : `<span class="bad">✗ expected ${want}</span>`;
   } else {
-    eq = `<div class="eq">S = <b>${sStr}</b></div>`;
-    line = 'Some outputs are still unknown.';
+    eq = `<div class="eq">${q} = <b>…</b></div>`;
+    line = '<span style="color:var(--muted)">still working it out: press ▸ to step</span>';
   }
   const N = lastStep();
-  const status = !sim.changed ? 'settled' : sim.at === N ? `settled after ${N} gate delay${N === 1 ? '' : 's'}` : `t = ${sim.at} of ${N} gate delays · still settling`;
+  const status = !sim.changed ? 'settled' : settled ? `settled after ${N} gate delay${N === 1 ? '' : 's'}` : `step ${sim.at} of ${N}`;
   document.getElementById('simResult').innerHTML = eq + `<div class="line">${line}</div><div class="status">${status}</div>`;
-  // bit table
-  const cls = x => isBit(x) ? 'v' + x : x === 'z' ? 'vz' : 'vx';
-  const td = x => `<td class="${cls(x)}">${VSHOW(x)}</td>`;
-  let rows = '';
-  for (let k = 3; k >= 0; k--) {
-    const fa = PINNET['fa@' + k];
-    rows += `<tr><td>${k}</td>${td(v('A' + k))}${td(v(fa.A))}${td(v('B' + k))}${td(v(fa.Cin))}${td(v(fa.Sum))}${td(v(fa.Cout))}${td(v('S' + k))}</tr>`;
+  renderSimMath();
+}
+// the addition the adder is doing, written out with the values on the wires right now
+function renderSimMath() {
+  const v = n => netVal('ALU4', '', n);
+  const prev = sim.at > 0 ? sim.H[sim.at - 1] : sim.changed ? sim.before : null;
+  const bit = n => { const x = v(n), c = !!prev && String(valIn(prev, { cell: 'ALU4', pre: '', n })) !== String(x); return `<i class="${c ? 'chg' : ''}">${VSHOW(x)}</i>`; };
+  const word = f => [3, 2, 1, 0].map(k => bit(f(k))).join('');
+  const xo = k => PINNET['xor@' + k].Y, cin = PINNET['fa@0'].Cin, Sn = k => 'S' + k;
+  const row = (l, b, n) => `<span class="ml">${l}</span><span class="mb">${b}</span><span class="mn">${n}</span>`;
+  const sub = sim.Sub === 1;
+  const h = '<div class="math">' +
+    row('B', word(k => 'B' + k), `= ${sim.B}`) +
+    row('A', word(k => 'A' + k), `= ${sim.A}`) +
+    (sub ? row('A flipped', word(xo), 'the 4 XORs flip A because Sub = 1') : row('A into adder', word(xo), 'Sub = 0, the XORs pass A through')) +
+    row('+ carry-in', bit(cin), sub ? 'Sub = 1 also feeds bit 0: the “+1”' : 'Sub = 0, nothing extra') +
+    '<span class="rule"></span>' +
+    row('result', `<i class="co">${VSHOW(v('Cout'))}</i> ${word(Sn)}`, 'Cout, then S3 S2 S1 S0') +
+    '</div>';
+  // how to read the answer
+  const S = [0, 1, 2, 3].map(k => v(Sn(k))), co = v('Cout'), str = S.slice().reverse().join('');
+  const s = S.every(isBit) ? S.reduce((a, x, k) => a + (x << k), 0) : null;
+  let r;
+  if (sim.at < lastStep()) r = 'The carries are still rippling, so these bits aren’t final yet. Keep stepping (▸) or jump to the end (⏭).';
+  else if (S.every(x => x === 'z')) r = 'En = 0, so S is switched off (Z).';
+  else if (s === null || !isBit(co)) r = 'Some bits are unknown.';
+  else if (!sub) r = `S = <code>${str}</code> = ${s}` + (co ? `, plus the carry out (16): <b>${s + 16}</b>` : `, no carry out: <b>${s}</b>`);
+  else {
+    const want = sim.B - sim.A, signed = S[3] ? s - 16 : s;
+    if (signed !== want) r = `The answer ${want} doesn’t fit in 4-bit two’s complement (−8 to 7), so here Cout gives the sign: Cout = <code>${co}</code> means ${co ? 'positive' : 'negative'}.`;
+    else if (!S[3]) r = `Leftmost bit S3 = <code>0</code> → <b>positive</b>.<br><code>${str}</code> = <b>${s}</b>` +
+      `<span class="sub">Cout = ${co}: no borrow. Ignore it: it’s the extra 16 that flipping A added.</span>`;
+    else {
+      const flip = S.map(x => x ^ 1), f = flip.reduce((a, x, k) => a + (x << k), 0), m = (f + 1) & 15;
+      const fstr = flip.slice().reverse().join(''), mstr = [3, 2, 1, 0].map(k => (m >> k) & 1).join('');
+      r = `Leftmost bit S3 = <code>1</code> → <b>negative</b>.<br>How negative? Flip <code>${str}</code> → <code>${fstr}</code>, add 1 → <code>${mstr}</code> = ${m}, so the answer is <b>−${m}</b>` +
+        `<span class="sub">Cout = ${co}: a borrow, which agrees: B was smaller than A.</span>`;
+    }
   }
-  document.getElementById('simBits').innerHTML = `<table class="tt vals"><thead><tr><th>bit</th><th>A</th><th>A⊕Sub</th><th>B</th><th>Cin</th><th>Sum</th><th>Cout</th><th>S</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('simMath').innerHTML = h + `<div class="read">${r}</div>`;
 }
 // friendly names for the nets a step can change
 const NAMEOF = new Map();
@@ -1481,8 +1533,6 @@ const NAMEOF = new Map();
     nm('S' + k, `S${k}: output (through the tri-state)`);
   }
 }
-const WAVE = [['C1', () => PINNET['fa@0'].Cout], ['C2', () => PINNET['fa@1'].Cout], ['C3', () => PINNET['fa@2'].Cout], ['Cout', () => 'Cout'],
-  ['S0', () => 'S0'], ['S1', () => 'S1'], ['S2', () => 'S2'], ['S3', () => 'S3']];
 function renderStep() {
   const N = lastStep(), at = sim.at;
   document.getElementById('tCount').innerHTML = sim.changed ? `t = <b>${at}</b> / ${N}` : 't = 0';
@@ -1491,28 +1541,6 @@ function renderStep() {
   document.getElementById('tFirst').disabled = document.getElementById('tPrev').disabled = at === 0;
   document.getElementById('tNext').disabled = document.getElementById('tLast').disabled = at >= N;
   pb.disabled = N === 0;
-  // timing diagram: one row per carry and output, one column per gate delay; click a column to jump there
-  const W = 300, LW = 34, RH = 15, top = 4, cols = N + 1, cw = Math.min(30, (W - LW - 4) / cols);
-  const yv = (v, y) => v === 1 ? y + 2 : v === 0 ? y + RH - 4 : y + RH / 2 - 1;
-  let g = `<rect x="${f(LW + at * cw)}" y="0" width="${f(cw)}" height="${top + WAVE.length * RH + 2}" fill="#ffc93c22" stroke="#ffc93c" stroke-width="1"/>`;
-  WAVE.forEach(([name, net], r) => {
-    const y = top + r * RH, id = find(net());
-    g += `<text x="${LW - 5}" y="${y + RH / 2 + 3}" text-anchor="end" font-size="10.5" fill="#b8c0cc" font-family="IBM Plex Mono, monospace">${name}</text>`;
-    let pv;
-    for (let t = 0; t <= N; t++) {
-      const v = sim.H[t] ? sim.H[t].get(id) : undefined, x0 = LW + t * cw, x1 = x0 + cw, Y = yv(v, y);
-      const col = v === 1 ? '#ff9a3c' : v === 0 ? '#8d96a6' : v === 'z' ? '#b48cff' : '#ff5b52';
-      if (t && pv !== v) g += `<line x1="${f(x0)}" y1="${f(yv(pv, y))}" x2="${f(x0)}" y2="${f(Y)}" stroke="#d0d5dd" stroke-width="1.2"/>`;
-      g += `<line x1="${f(x0)}" y1="${f(Y)}" x2="${f(x1)}" y2="${f(Y)}" stroke="${col}" stroke-width="${v === 1 ? 2.4 : 1.4}"${v === 'z' ? ' stroke-dasharray="3 2"' : ''}/>`;
-      pv = v;
-    }
-  });
-  const yb = top + WAVE.length * RH + 12;
-  for (let t = 0; t <= N; t++) {
-    if (cw >= 12 || t % 2 === 0 || t === N) g += `<text x="${f(LW + t * cw + cw / 2)}" y="${yb}" text-anchor="middle" font-size="9.5" fill="${t === at ? '#ffc93c' : '#8d96a6'}" font-family="IBM Plex Mono, monospace">${t}</text>`;
-    g += `<rect data-t="${t}" x="${f(LW + t * cw)}" y="0" width="${f(cw)}" height="${yb + 4}" fill="transparent" style="cursor:pointer"/>`;
-  }
-  document.getElementById('simWave').innerHTML = `<svg viewBox="0 0 ${W} ${yb + 5}" width="100%" role="img" aria-label="Timing diagram of the carries and outputs">${g}</svg>`;
   // what changed in the shown step
   const prev = at > 0 ? sim.H[at - 1] : sim.changed ? sim.before : null, now = sim.H[at];
   const rows = [];
@@ -1521,41 +1549,34 @@ function renderStep() {
     if (u !== v && NAMEOF.has(id)) rows.push([NAMEOF.get(id), u, v]);
   }
   const cls = x => isBit(x) ? 'v' + x : x === 'z' ? 'vz' : 'vx';
-  const head = !sim.changed ? 'Change an input, then step through it with ▸.' :
+  const head = !sim.changed ? 'Pick a case above, then step through it with ▸.' :
     at === 0 ? 'Step 0: the inputs change. No gate has reacted yet.' :
     rows.length ? `Step ${at}: these gate outputs changed` : `Step ${at}: nothing changed, the circuit has settled.`;
   document.getElementById('simChanges').innerHTML = `<div class="ch-h">${head}</div>` +
-    rows.map(([n, u, v]) => `<div class="ch"><span>${esc(n)}</span><b><i class="${cls(u)}">${VSHOW(u)}</i> → <i class="${cls(v)}">${VSHOW(v)}</i></b></div>`).join('');
-}
-const SPEEDS = [[1000, 'Slow'], [450, 'Normal'], [150, 'Fast'], [0, 'Instant']];
-function renderSimSpeed() {
-  document.getElementById('simSpeed').innerHTML = SPEEDS.map(([ms, l]) => `<button type="button" data-speed="${ms}" aria-pressed="${sim.speed === ms}">${l}</button>`).join('');
+    rows.slice(0, 7).map(([n, u, v]) => `<div class="ch"><span>${esc(n)}</span><b><i class="${cls(u)}">${VSHOW(u)}</i> → <i class="${cls(v)}">${VSHOW(v)}</i></b></div>`).join('') +
+    (rows.length > 7 ? `<div class="ch-h">… and ${rows.length - 7} more</div>` : '');
 }
 const PRESETS = [
-  ['5 + 3', { A: 5, B: 3, Sub: 0, En: 1 }],
-  ['15 + 1 · full ripple', { A: 15, B: 1, Sub: 0, En: 1 }],
-  ['7 − 2', { A: 2, B: 7, Sub: 1, En: 1 }],
-  ['3 − 5 · borrow', { A: 5, B: 3, Sub: 1, En: 1 }],
-  ['9 − 9', { A: 9, B: 9, Sub: 1, En: 1 }],
-  ['Output off', { En: 0 }],
+  ['7 − 2', 'answer is positive', { A: 2, B: 7, Sub: 1, En: 1 }],
+  ['3 − 5', 'answer is negative', { A: 5, B: 3, Sub: 1, En: 1 }],
 ];
-document.getElementById('simPresets').innerHTML = PRESETS.map(([l], i) => `<button class="btn" type="button" data-preset="${i}">${l}</button>`).join('');
+function renderCases() {
+  document.getElementById('simPresets').innerHTML = PRESETS.map(([l, d, c], i) =>
+    `<button class="case" type="button" data-preset="${i}" aria-pressed="${c.A === sim.A && c.B === sim.B && c.Sub === sim.Sub && c.En === sim.En}"><b>${l}</b><small>${d}</small></button>`).join('');
+}
 document.getElementById('simSide').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   const d = b.dataset;
   if (d.in) flipInput(d.in);
   else if (d.step) { const [w, s] = d.step.split(','); simSet({ [w]: (sim[w] + +s + 16) % 16 }); }
   else if (d.set) { const [k, v] = d.set.split(','); if (sim[k] !== +v) simSet({ [k]: +v }); }
-  else if (d.preset) simSet(PRESETS[+d.preset][1]);
-  else if (d.speed !== undefined) { sim.speed = +d.speed; renderSimSpeed(); }
+  else if (d.preset) simSet(PRESETS[+d.preset][2]);
   else if (b.id === 'tFirst') simStepBy(-1e9);
   else if (b.id === 'tPrev') simStepBy(-1);
   else if (b.id === 'tPlay') simPlay(!sim.playing);
   else if (b.id === 'tNext') simStepBy(1);
   else if (b.id === 'tLast') simStepBy(1e9);
 });
-document.getElementById('simWave').addEventListener('click', e => { const r = e.target.closest('[data-t]'); if (r) { simPlay(false); simShow(+r.dataset.t); } });
-document.getElementById('simAuto').addEventListener('change', e => { sim.auto = e.target.checked; });
 document.getElementById('simUp').addEventListener('click', simUp);
 document.querySelectorAll('[data-simfit]').forEach(b => b.addEventListener('click', () => simPanes[b.dataset.simfit].fit(true)));
 bindSplit(document.getElementById('simSplit'), simMainEl, () => { autoSplit(simCur().cell, simMainEl, simPanes.sch.svg); requestAnimationFrame(() => { simPanes.sch.fit(); simPanes.lay.fit(); }); });
@@ -1575,7 +1596,9 @@ function showPage(on) {
   simOn = on;
   document.getElementById('explorer').hidden = on;
   document.getElementById('simApp').hidden = !on;
-  if (on && !simReady) { simReady = true; settleNow(); sim.H = [new Map(sim.V)]; sim.at = 0; renderSimInputs(); renderSimSpeed(); simGo(); renderSimResult(); renderStep(); }
+  if (on && !simReady) { simReady = true; // start from all-zero inputs and record the change to the first case, so Play can replay it right away
+    const c = { A: sim.A, B: sim.B, Sub: sim.Sub }; Object.assign(sim, { A: 0, B: 0, Sub: 0 }); settleNow(); Object.assign(sim, c); record(); sim.at = lastStep();
+    renderSimInputs(); simGo(); renderSimResult(); renderStep(); }
   else if (on) { simGo(); }
   else { panes.sch.apply(); panes.lay.apply(); }
   const h = on ? '#sim' : '';
