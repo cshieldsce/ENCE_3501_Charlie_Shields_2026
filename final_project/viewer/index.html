@@ -243,7 +243,7 @@ table.vals th:first-child, table.vals td:first-child { color: var(--muted); }
 .math .mb { font-family: var(--mono); font-size: 21px; font-weight: 600; text-align: right; letter-spacing: .1em; white-space: pre; font-variant-numeric: tabular-nums; }
 .math .mn { font-size: 12px; color: var(--muted); line-height: 1.3; }
 .math .rule { grid-column: 1 / -1; border-top: 1px solid #4a5466; margin: 1px 0; }
-.math i { font-style: normal; } .math i.chg { color: var(--hot); } .math i.co { color: var(--muted); }
+.math i { font-style: normal; } .math i.chg { color: var(--hot); } .math i.co { color: var(--muted); } .math i.ptr { color: var(--hot); } .math .mn b { color: var(--v1); font-weight: 600; }
 .read { margin-top: 10px; font-size: 14px; line-height: 1.55; color: #c9cfd8; }
 .read b { color: var(--hot); font-family: var(--mono); font-size: 17px; }
 .read code { font-family: var(--mono); background: #232a35; padding: 1px 5px; border-radius: 3px; }
@@ -1480,6 +1480,16 @@ function renderSimResult() {
   document.getElementById('simResult').innerHTML = eq + `<div class="line">${line}</div><div class="status">${status}</div>`;
   renderSimMath();
 }
+// what the carry out of bit 3 tells you, once it has settled
+function coutMeaning(co, sub) {
+  if (sim.at < lastStep() || !isBit(co)) return 'Cout: the carry out of bit 3';
+  if (sub) return co
+    ? `<b>Cout = 1 → B ≥ A</b> (${sim.B} ≥ ${sim.A}): no borrow, the answer is positive or 0`
+    : `<b>Cout = 0 → B &lt; A</b> (${sim.B} &lt; ${sim.A}): a borrow, the answer is negative`;
+  return co
+    ? `<b>Cout = 1 → A + B &gt; 15</b>: too big for 4 bits, Cout is worth 16`
+    : `<b>Cout = 0 → A + B ≤ 15</b>: the answer fits in 4 bits`;
+}
 // the addition the adder is doing, written out with the values on the wires right now
 function renderSimMath() {
   const v = n => netVal('ALU4', '', n);
@@ -1501,6 +1511,8 @@ function renderSimMath() {
         row('+ carry-in', bit(cin), 'Sub = 0, nothing extra')) +
     '<span class="rule"></span>' +
     row('result', `<i class="co">${VSHOW(v('Cout'))}</i> ${word(Sn)}`, 'Cout, then S3 S2 S1 S0') +
+    // an arrow under the Cout digit saying what it means
+    row('', `<i class="ptr">↑</i>     `, coutMeaning(v('Cout'), sub)) +
     '</div>';
   // how to read the answer
   const S = [0, 1, 2, 3].map(k => v(Sn(k))), co = v('Cout'), str = S.slice().reverse().join('');
@@ -1514,12 +1526,11 @@ function renderSimMath() {
     const want = sim.B - sim.A, signed = S[3] ? s - 16 : s;
     if (signed !== want) r = `The answer ${want} doesn’t fit in 4-bit two’s complement (−8 to 7), so here Cout gives the sign: Cout = <code>${co}</code> means ${co ? 'positive' : 'negative'}.`;
     else if (!S[3]) r = `Leftmost bit S3 = <code>0</code> → <b>positive</b>.<br><code>${str}</code> = <b>${s}</b>` +
-      `<span class="sub">Cout = ${co}: no borrow. Ignore it: it’s the extra 16 that flipping A added.</span>`;
+      `<span class="sub">Leave Cout out when reading S: it’s the extra 16 that flipping A added.</span>`;
     else {
       const flip = S.map(x => x ^ 1), f = flip.reduce((a, x, k) => a + (x << k), 0), m = (f + 1) & 15;
       const fstr = flip.slice().reverse().join(''), mstr = [3, 2, 1, 0].map(k => (m >> k) & 1).join('');
-      r = `Leftmost bit S3 = <code>1</code> → <b>negative</b>.<br>How negative? Flip <code>${str}</code> → <code>${fstr}</code>, add 1 → <code>${mstr}</code> = ${m}, so the answer is <b>−${m}</b>` +
-        `<span class="sub">Cout = ${co}: a borrow, which agrees: B was smaller than A.</span>`;
+      r = `Leftmost bit S3 = <code>1</code> → <b>negative</b>.<br>How negative? Flip <code>${str}</code> → <code>${fstr}</code>, add 1 → <code>${mstr}</code> = ${m}, so the answer is <b>−${m}</b>`;
     }
   }
   document.getElementById('simMath').innerHTML = h + `<div class="read">${r}</div>`;
